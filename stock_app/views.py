@@ -8,6 +8,7 @@ from inertia import render_inertia
 from finance.models import Account, Currency, Expense, ExpenseType, Transaction
 from .forms import DepartmentForm, StockMovementForm
 from .models import Category, Department, Party, Product, PurchaseBatch, PurchaseItem, PurchasePayment, Sale, SaleItem, SalePayment, StockMovement, StockProfitReport, Unit
+from .models import ProductReorderRule, ApprovalRequest, BusinessDocument, PartyLedgerEntry, ReturnRecord, StockAdjustmentReason, StockCountSession, ProductBatchTracking, CostingConfiguration, AdvancedReportRequest, ExportJob
 
 User = get_user_model()
 
@@ -27,23 +28,12 @@ def _can(user, action, model_or_name, app_label='stock_app'):
         return True
     model_name = model_or_name if isinstance(model_or_name, str) else model_or_name._meta.model_name
     django_action = {'create': 'add', 'edit': 'change'}.get(action, action)
-    return (
-        user.has_perm(f'{app_label}.{action}_{model_name}')
-        or user.has_perm(f'{app_label}.{action}_all_{model_name}')
-        or user.has_perm(f'{app_label}.{action}_own_{model_name}')
-        or user.has_perm(f'{app_label}.{django_action}_{model_name}')
-    )
+    return (user.has_perm(f'{app_label}.{action}_{model_name}') or user.has_perm(f'{app_label}.{action}_all_{model_name}') or user.has_perm(f'{app_label}.{action}_own_{model_name}') or user.has_perm(f'{app_label}.{django_action}_{model_name}'))
 
 
 def _require(user, action, model_or_name, app_label='stock_app'):
     if not _can(user, action, model_or_name, app_label):
         raise PermissionDenied
-
-
-def _safe_queryset(user, model, app_label='stock_app'):
-    if app_label == 'finance':
-        return model.objects.for_user(user)
-    return model.objects.for_user(user)
 
 
 def _common_options(user, keys=()):
@@ -63,8 +53,12 @@ def _common_options(user, keys=()):
     return data
 
 
+def _auth(request):
+    return {'user': {'username': request.user.get_username(), 'email': request.user.email}}
+
+
 def _render_index(request, page, prop, queryset, fields, options=()):
-    return render_inertia(request, page, {prop: _rows(queryset, *fields), 'options': _common_options(request.user, options), 'auth': {'user': {'username': request.user.get_username(), 'email': request.user.email}}})
+    return render_inertia(request, page, {prop: _rows(queryset, *fields), 'options': _common_options(request.user, options), 'auth': _auth(request)})
 
 
 @login_required
@@ -74,7 +68,33 @@ def dashboard(request):
         {'label': 'Purchases', 'value': PurchaseBatch.objects.for_user(request.user).count()},
         {'label': 'Sales', 'value': Sale.objects.for_user(request.user).count()},
         {'label': 'Accounts', 'value': Account.objects.for_user(request.user).count() if _can(request.user, 'view', 'account', 'finance') else 0},
-    ], 'auth': {'user': {'username': request.user.get_username(), 'email': request.user.email}}})
+    ], 'auth': _auth(request)})
+
+
+@login_required
+def operations_index(request):
+    low_stock_rules = ProductReorderRule.objects.for_user(request.user).select_related('product', 'preferred_supplier')[:100]
+    near_expiry = ProductBatchTracking.objects.for_user(request.user).select_related('product').exclude(expiry_date__isnull=True)[:100]
+    return render_inertia(request, 'Operations', {
+        'auth': _auth(request),
+        'summary': {
+            'lowStock': sum(1 for rule in low_stock_rules if rule.is_low_stock),
+            'pendingApprovals': ApprovalRequest.objects.for_user(request.user).filter(status='pending').count(),
+            'openReturns': ReturnRecord.objects.for_user(request.user).exclude(status__in=['posted', 'cancelled']).count(),
+            'queuedExports': ExportJob.objects.for_user(request.user).exclude(status='completed').count(),
+        },
+        'lowStockRules': [{'id': r.id, 'product': r.product.name, 'current': str(r.product.quantity), 'minimum': str(r.minimum_stock), 'reorderQuantity': str(r.reorder_quantity), 'supplier': r.preferred_supplier.name if r.preferred_supplier else ''} for r in low_stock_rules],
+        'approvals': _rows(ApprovalRequest.objects.for_user(request.user).order_by('-created_at')[:100], 'id', 'workflow_type', 'status', 'title', 'reference_number', 'created_at'),
+        'documents': _rows(BusinessDocument.objects.for_user(request.user).order_by('-issued_at')[:100], 'id', 'document_type', 'title', 'reference_number', 'issued_at'),
+        'partyLedger': _rows(PartyLedgerEntry.objects.for_user(request.user).select_related('party').order_by('-posted_at')[:100], 'id', 'party__name', 'entry_type', 'debit', 'credit', 'reference_number', 'posted_at'),
+        'returns': _rows(ReturnRecord.objects.for_user(request.user).order_by('-return_date', '-id')[:100], 'id', 'return_number', 'return_type', 'status', 'return_date'),
+        'stockReasons': _rows(StockAdjustmentReason.objects.for_user(request.user).order_by('name')[:100], 'id', 'name', 'requires_approval'),
+        'stockCounts': _rows(StockCountSession.objects.for_user(request.user).order_by('-scheduled_date')[:100], 'id', 'count_number', 'status', 'scheduled_date'),
+        'batchTracking': [{'id': b.id, 'product': b.product.name, 'batchNumber': b.batch_number, 'expiryDate': b.expiry_date, 'quantity': str(b.quantity), 'expired': b.is_expired} for b in near_expiry],
+        'costing': _rows(CostingConfiguration.objects.for_user(request.user).order_by('name')[:50], 'id', 'name', 'method', 'is_default'),
+        'advancedReports': _rows(AdvancedReportRequest.objects.for_user(request.user).order_by('-created_at')[:100], 'id', 'report_type', 'title', 'date_from', 'date_to'),
+        'exports': _rows(ExportJob.objects.for_user(request.user).order_by('-created_at')[:100], 'id', 'export_type', 'file_format', 'status', 'created_at'),
+    })
 
 
 @login_required
@@ -82,7 +102,7 @@ def users_index(request):
     if not request.user.is_superuser and not request.user.has_perm('auth.view_user'):
         raise PermissionDenied
     users = User.objects.filter(is_active=True).order_by('username').values('id', 'username', 'email')
-    return render_inertia(request, 'Users', {'users': list(users), 'auth': {'user': {'username': request.user.get_username(), 'email': request.user.email}}})
+    return render_inertia(request, 'Users', {'users': list(users), 'auth': _auth(request)})
 
 
 @login_required
@@ -118,7 +138,7 @@ def stock_movements_index(request):
         movements = StockMovement.objects.for_user(request.user).select_related('product', 'from_department', 'to_department')[:200]
         return render_inertia(request, 'StockMovements', {'stockMovements': _stock_movement_rows(movements), 'options': _common_options(request.user, ('products', 'departments')), 'errors': form.errors}, status=422)
     movements = StockMovement.objects.for_user(request.user).select_related('product', 'from_department', 'to_department')[:200]
-    return render_inertia(request, 'StockMovements', {'stockMovements': _stock_movement_rows(movements), 'options': _common_options(request.user, ('products', 'departments'))})
+    return render_inertia(request, 'StockMovements', {'stockMovements': _stock_movement_rows(movements), 'options': _common_options(request.user, ('products', 'departments')), 'auth': _auth(request)})
 
 
 def _stock_movement_rows(queryset):
