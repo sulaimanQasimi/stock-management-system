@@ -122,6 +122,20 @@ class PurchaseItem(AuthorizationAuditModel):
         super().save(*args, **kwargs)
         self.purchase.update_total()
 
+        from .stock import StockMovement
+        StockMovement.post_delta(
+            product=self.product,
+            movement_type=StockMovement.INCREASE,
+            target_quantity=self.total_base_unit,
+            source_type=StockMovement.SOURCE_PURCHASE,
+            source_id=self.purchase_id,
+            source_line_id=self.id,
+            reference_number=self.purchase.batch_number,
+            reason='Purchase stock received',
+            note=self.note,
+            user=self.updated_by or self.created_by,
+        )
+
 
 class PurchasePayment(AuthorizationAuditModel):
     purchase = models.ForeignKey(PurchaseBatch, on_delete=models.CASCADE, related_name='payments')
