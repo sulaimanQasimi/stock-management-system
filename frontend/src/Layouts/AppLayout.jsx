@@ -4,6 +4,8 @@ import { Link } from '@inertiajs/react';
 const navigation = [
   { label: 'Dashboard', href: '/' },
   { label: 'Products', href: '/products/' },
+  { label: 'Stock Movements', href: '/stock-movements/' },
+  { label: 'Departments', href: '/departments/' },
   { label: 'Purchases', href: '/purchase-batches/' },
   { label: 'Sales', href: '/sales/' },
   { label: 'Finance', href: '/accounts/' },
