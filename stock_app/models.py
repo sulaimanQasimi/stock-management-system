@@ -2,31 +2,36 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from authorization.models import AuthorizationAuditModel, build_model_permissions
 
 
 ZERO = Decimal('0.00')
 
 
-class Category(models.Model):
+class Category(AuthorizationAuditModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
 
+    class Meta:
+        permissions = build_model_permissions('category', 'category')
+
     def __str__(self):
         return self.name
 
 
-class Unit(models.Model):
-    name = models.CharField(max_length=50, unique=True)  # e.g., kg, piece, liter
+class Unit(AuthorizationAuditModel):
+    name = models.CharField(max_length=50, unique=True)
     abbreviation = models.CharField(max_length=20, blank=True)
 
+    class Meta:
+        permissions = build_model_permissions('unit', 'unit')
+
     def __str__(self):
         return self.name
 
 
-class Party(models.Model):
+class Party(AuthorizationAuditModel):
     PARTY_TYPE_CHOICES = (
         ('supplier', 'Supplier'),
         ('customer', 'Customer'),
@@ -38,14 +43,15 @@ class Party(models.Model):
     phone = models.CharField(max_length=50, blank=True)
     address = models.TextField(blank=True)
     description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = build_model_permissions('party', 'party')
 
     def __str__(self):
         return self.name
 
 
-class Product(models.Model):
+class Product(AuthorizationAuditModel):
     name = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
     unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True)
@@ -54,8 +60,9 @@ class Product(models.Model):
     pack_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     unit_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = build_model_permissions('product', 'product')
 
     def __str__(self):
         return self.name
@@ -81,7 +88,7 @@ class Product(models.Model):
         return self.total_sales_amount - self.total_cost_of_goods_sold
 
 
-class PurchaseBatch(models.Model):
+class PurchaseBatch(AuthorizationAuditModel):
     batch_number = models.CharField(max_length=100, unique=True)
     date = models.DateField()
     party = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='purchase_batches')
@@ -90,13 +97,10 @@ class PurchaseBatch(models.Model):
     reference_number = models.CharField(max_length=100, blank=True)
     invoice_number = models.CharField(max_length=100, blank=True)
     note = models.TextField(blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='purchase_batches_created')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='purchase_batches_updated')
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-date', '-id']
+        permissions = build_model_permissions('purchasebatch', 'purchase batch')
 
     def __str__(self):
         return f"Purchase {self.batch_number}"
@@ -136,7 +140,7 @@ class PurchaseBatch(models.Model):
         return self.items.aggregate(total=models.Sum('remaining_cost_value'))['total'] or ZERO
 
 
-class PurchaseItem(models.Model):
+class PurchaseItem(AuthorizationAuditModel):
     PURCHASE_UNIT_CHOICES = (
         ('piece', 'Piece'),
         ('pack', 'Pack'),
@@ -153,11 +157,10 @@ class PurchaseItem(models.Model):
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)
     total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     note = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['id']
+        permissions = build_model_permissions('purchaseitem', 'purchase item')
 
     def __str__(self):
         return f"{self.product} - {self.quantity} {self.piece_or_pack}"
@@ -203,19 +206,20 @@ class PurchaseItem(models.Model):
         self.purchase.update_total()
 
 
-class PurchasePayment(models.Model):
+class PurchasePayment(AuthorizationAuditModel):
     purchase = models.ForeignKey(PurchaseBatch, on_delete=models.CASCADE, related_name='payments')
     account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='purchase_payments')
     transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='purchase_payment')
     currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='purchase_payments')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = build_model_permissions('purchasepayment', 'purchase payment')
 
     def __str__(self):
         return f"Payment for {self.purchase.batch_number}"
 
 
-class Sale(models.Model):
+class Sale(AuthorizationAuditModel):
     sale_number = models.CharField(max_length=100, unique=True)
     date = models.DateField()
     party = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='sales')
@@ -226,13 +230,10 @@ class Sale(models.Model):
     reference_number = models.CharField(max_length=100, blank=True)
     invoice_number = models.CharField(max_length=100, blank=True)
     note = models.TextField(blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_created')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_updated')
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-date', '-id']
+        permissions = build_model_permissions('sale', 'sale')
 
     def __str__(self):
         return f"Sale {self.sale_number}"
@@ -259,7 +260,7 @@ class Sale(models.Model):
         return (self.gross_profit / self.net_total) * Decimal('100')
 
 
-class SaleItem(models.Model):
+class SaleItem(AuthorizationAuditModel):
     SALE_UNIT_CHOICES = (
         ('piece', 'Piece'),
         ('pack', 'Pack'),
@@ -280,11 +281,10 @@ class SaleItem(models.Model):
     gross_profit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     profit_margin_percent = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     note = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['id']
+        permissions = build_model_permissions('saleitem', 'sale item')
 
     def __str__(self):
         return f"{self.product} - {self.quantity} {self.pack_or_piece}"
@@ -328,20 +328,21 @@ class SaleItem(models.Model):
         self.sale.update_total()
 
 
-class SalePayment(models.Model):
+class SalePayment(AuthorizationAuditModel):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='payments')
     account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='sale_payments')
     transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='sale_payment')
     currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payments')
     amount = models.DecimalField(max_digits=15, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = build_model_permissions('salepayment', 'sale payment')
 
     def __str__(self):
         return f"Payment for {self.sale.sale_number}"
 
 
-class StockProfitReport(models.Model):
+class StockProfitReport(AuthorizationAuditModel):
     REPORT_SCOPE_CHOICES = (
         ('general', 'General'),
         ('batch', 'Purchase Batch'),
@@ -366,11 +367,10 @@ class StockProfitReport(models.Model):
     remaining_stock_value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     note = models.TextField(blank=True)
-    generated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='stock_profit_reports_generated')
-    generated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-generated_at']
+        ordering = ['-created_at']
+        permissions = build_model_permissions('stockprofitreport', 'stock profit report')
 
     def __str__(self):
         if self.report_scope == 'batch' and self.purchase_batch:
