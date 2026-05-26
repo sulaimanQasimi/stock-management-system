@@ -136,7 +136,7 @@ class SalePayment(AuthorizationAuditModel):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='payments')
     account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='sale_payments')
     transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='sale_payment')
-    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payment')
+    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payments')
     amount = models.DecimalField(max_digits=15, decimal_places=2)
 
     class Meta:
