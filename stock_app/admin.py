@@ -4,6 +4,7 @@ from authorization.models import AuthorizationActivityLog
 
 from .models import (
     Category,
+    Department,
     Party,
     Product,
     PurchaseBatch,
@@ -12,6 +13,7 @@ from .models import (
     Sale,
     SaleItem,
     SalePayment,
+    StockMovement,
     StockProfitReport,
     Unit,
 )
@@ -130,6 +132,22 @@ class StockProfitReportAdmin(AuthorizedAdminMixin, admin.ModelAdmin):
         'total_purchase_cost', 'total_cost_of_goods_sold', 'total_sales', 'gross_profit',
         'profit_margin_percent', 'remaining_stock_value',
     )
+
+
+@admin.register(Department)
+class DepartmentAdmin(AuthorizedAdminMixin, admin.ModelAdmin):
+    list_display = ('name', 'code', 'is_trashed', 'created_by', 'updated_by')
+    list_filter = ('is_trashed',)
+    search_fields = ('name', 'code')
+    readonly_fields = AuthorizedAdminMixin.audit_readonly_fields
+
+
+@admin.register(StockMovement)
+class StockMovementAdmin(AuthorizedAdminMixin, admin.ModelAdmin):
+    list_display = ('movement_date', 'product', 'movement_type', 'quantity', 'from_department', 'to_department', 'reference_number', 'created_by', 'is_trashed')
+    list_filter = ('movement_type', 'movement_date', 'from_department', 'to_department', 'is_trashed')
+    search_fields = ('product__name', 'reference_number', 'reason', 'note')
+    readonly_fields = AuthorizedAdminMixin.audit_readonly_fields + ('movement_date',)
 
 
 @admin.register(Category)
