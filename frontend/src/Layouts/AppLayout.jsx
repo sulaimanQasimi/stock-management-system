@@ -5,10 +5,12 @@ const navigation = [
   { label: 'Dashboard', href: '/', icon: '◼' },
   { label: 'Operations', href: '/operations/', icon: '★' },
   { label: 'Products', href: '/products/', icon: '□' },
+  { label: 'Services', href: '/services/', icon: '◇' },
   { label: 'Stock Movements', href: '/stock-movements/', icon: '↕' },
   { label: 'Departments', href: '/departments/', icon: '⌂' },
   { label: 'Purchases', href: '/purchase-batches/', icon: '+' },
   { label: 'Sales', href: '/sales/', icon: '−' },
+  { label: 'Sale Services', href: '/sale-service-items/', icon: '✦' },
   { label: 'Finance', href: '/accounts/', icon: '$' },
   { label: 'Reports', href: '/stock-profit-reports/', icon: '↗' },
 ];

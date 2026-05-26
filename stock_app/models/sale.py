@@ -10,6 +10,21 @@ from .core import Party, Product
 from .purchase import PurchaseBatch, PurchaseItem
 
 
+class Service(AuthorizationAuditModel):
+    name = models.CharField(max_length=200, unique=True)
+    price = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal('0'))])
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+        permissions = build_model_permissions('service', 'service')
+        indexes = [models.Index(fields=['name']), models.Index(fields=['is_active'])]
+
+    def __str__(self):
+        return self.name
+
+
 class Sale(AuthorizationAuditModel):
     sale_number = models.CharField(max_length=100, unique=True)
     date = models.DateField()
@@ -36,11 +51,17 @@ class Sale(AuthorizationAuditModel):
             raise ValidationError({'discount': 'Discount cannot be greater than sale total.'})
 
     def update_total(self):
-        total = self.items.aggregate(total=models.Sum('total'))['total'] or ZERO
+        product_total = self.items.aggregate(total=models.Sum('total'))['total'] or ZERO
+        service_total = self.service_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+        total = product_total + service_total
         self.total = total
         self.net_total = total - self.discount
         self.save(update_fields=['total', 'net_total', 'updated_at'])
         return self.net_total
+
+    @property
+    def service_total(self):
+        return self.service_items.aggregate(total=models.Sum('total'))['total'] or ZERO
 
     @property
     def cost_of_goods_sold(self):
@@ -117,6 +138,33 @@ class SaleItem(AuthorizationAuditModel):
             super().save(*args, **kwargs)
             self.sale.update_total()
             StockMovement.post_delta(product=self.product, movement_type=StockMovement.DECREASE, target_quantity=self.total_base_unit, source_type=StockMovement.SOURCE_SALE, source_id=self.sale_id, source_line_id=self.id, reference_number=self.sale.sale_number, reason='Sale stock issued', note=self.note, user=self.updated_by or self.created_by)
+
+
+class SaleServiceItem(AuthorizationAuditModel):
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='service_items')
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name='sale_items')
+    quantity = models.DecimalField(max_digits=12, decimal_places=2, default=1, validators=[MinValueValidator(Decimal('0.01'))])
+    unit_price = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
+    note = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['id']
+        permissions = build_model_permissions('saleserviceitem', 'sale service item')
+
+    def __str__(self):
+        return f"{self.sale} - {self.service}"
+
+    def clean(self):
+        if self.service_id and not self.unit_price:
+            self.unit_price = self.service.price
+        self.total = self.quantity * self.unit_price
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            self.sale.update_total()
 
 
 class SalePayment(AuthorizationAuditModel):

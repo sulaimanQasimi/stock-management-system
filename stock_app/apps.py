@@ -8,5 +8,6 @@ class StockAppConfig(AppConfig):
     def ready(self):
         try:
             import stock_app.admin_features  # noqa: F401
+            import stock_app.admin_services  # noqa: F401
         except Exception:
             pass
