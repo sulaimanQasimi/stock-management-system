@@ -1,4 +1,8 @@
-from django.db import models
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
+from django.db import models, transaction
 
 from authorization.models import AuthorizationAuditModel, build_model_permissions
 from .constants import ZERO
@@ -10,7 +14,7 @@ class PurchaseBatch(AuthorizationAuditModel):
     date = models.DateField()
     party = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='purchase_batches')
     currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='purchase_batches')
-    total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
     reference_number = models.CharField(max_length=100, blank=True)
     invoice_number = models.CharField(max_length=100, blank=True)
     note = models.TextField(blank=True)
@@ -21,6 +25,10 @@ class PurchaseBatch(AuthorizationAuditModel):
 
     def __str__(self):
         return f"Purchase {self.batch_number}"
+
+    def clean(self):
+        if self.party_id and not self.party.can_supply:
+            raise ValidationError({'party': 'Purchase party must be a supplier or both.'})
 
     def update_total(self):
         total = self.items.aggregate(total=models.Sum('total'))['total'] or ZERO
@@ -58,21 +66,17 @@ class PurchaseBatch(AuthorizationAuditModel):
 
 
 class PurchaseItem(AuthorizationAuditModel):
-    PURCHASE_UNIT_CHOICES = (
-        ('piece', 'Piece'),
-        ('pack', 'Pack'),
-    )
-
+    PURCHASE_UNIT_CHOICES = (('piece', 'Piece'), ('pack', 'Pack'))
     purchase = models.ForeignKey(PurchaseBatch, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='purchase_items')
-    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+    quantity = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     piece_or_pack = models.CharField(max_length=10, choices=PURCHASE_UNIT_CHOICES, default='piece')
     unit_for_piece = models.ForeignKey(Unit, on_delete=models.PROTECT, related_name='purchase_piece_items')
     unit_for_pack = models.ForeignKey(Unit, on_delete=models.PROTECT, related_name='purchase_pack_items', null=True, blank=True)
-    per_pack = models.DecimalField(max_digits=12, decimal_places=2, default=1)
-    total_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    unit_price = models.DecimalField(max_digits=12, decimal_places=2)
-    total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    per_pack = models.DecimalField(max_digits=12, decimal_places=2, default=1, validators=[MinValueValidator(Decimal('0.01'))])
+    total_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
     note = models.TextField(blank=True)
 
     class Meta:
@@ -81,6 +85,18 @@ class PurchaseItem(AuthorizationAuditModel):
 
     def __str__(self):
         return f"{self.product} - {self.quantity} {self.piece_or_pack}"
+
+    def _calculate_totals(self):
+        self.total_base_unit = self.quantity * self.per_pack if self.piece_or_pack == 'pack' else self.quantity
+        self.total = self.quantity * self.unit_price
+
+    def clean(self):
+        old = PurchaseItem.objects.filter(pk=self.pk).first() if self.pk else None
+        if old and old.product_id != self.product_id:
+            raise ValidationError({'product': 'Product cannot be changed after purchase item is posted.'})
+        if old and old.purchase_id != self.purchase_id:
+            raise ValidationError({'purchase': 'Purchase cannot be changed after purchase item is posted.'})
+        self._calculate_totals()
 
     @property
     def sold_base_unit(self):
@@ -92,9 +108,7 @@ class PurchaseItem(AuthorizationAuditModel):
 
     @property
     def cost_per_base_unit(self):
-        if not self.total_base_unit:
-            return ZERO
-        return self.total / self.total_base_unit
+        return ZERO if not self.total_base_unit else self.total / self.total_base_unit
 
     @property
     def sales_amount(self):
@@ -113,28 +127,12 @@ class PurchaseItem(AuthorizationAuditModel):
         return self.remaining_base_unit * self.cost_per_base_unit
 
     def save(self, *args, **kwargs):
-        if self.piece_or_pack == 'pack':
-            self.total_base_unit = self.quantity * self.per_pack
-        else:
-            self.total_base_unit = self.quantity
-
-        self.total = self.quantity * self.unit_price
-        super().save(*args, **kwargs)
-        self.purchase.update_total()
-
         from .stock import StockMovement
-        StockMovement.post_delta(
-            product=self.product,
-            movement_type=StockMovement.INCREASE,
-            target_quantity=self.total_base_unit,
-            source_type=StockMovement.SOURCE_PURCHASE,
-            source_id=self.purchase_id,
-            source_line_id=self.id,
-            reference_number=self.purchase.batch_number,
-            reason='Purchase stock received',
-            note=self.note,
-            user=self.updated_by or self.created_by,
-        )
+        self.full_clean()
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            self.purchase.update_total()
+            StockMovement.post_delta(product=self.product, movement_type=StockMovement.INCREASE, target_quantity=self.total_base_unit, source_type=StockMovement.SOURCE_PURCHASE, source_id=self.purchase_id, source_line_id=self.id, reference_number=self.purchase.batch_number, reason='Purchase stock received', note=self.note, user=self.updated_by or self.created_by)
 
 
 class PurchasePayment(AuthorizationAuditModel):
@@ -142,9 +140,14 @@ class PurchasePayment(AuthorizationAuditModel):
     account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='purchase_payments')
     transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='purchase_payment')
     currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='purchase_payments')
+    amount = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
 
     class Meta:
         permissions = build_model_permissions('purchasepayment', 'purchase payment')
+
+    def clean(self):
+        if self.transaction_id and self.amount != self.transaction.amount:
+            raise ValidationError({'amount': 'Purchase payment amount must match the linked transaction amount.'})
 
     def __str__(self):
         return f"Payment for {self.purchase.batch_number}"

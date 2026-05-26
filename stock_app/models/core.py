@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from authorization.models import AuthorizationAuditModel, build_model_permissions
@@ -27,12 +30,7 @@ class Unit(AuthorizationAuditModel):
 
 
 class Party(AuthorizationAuditModel):
-    PARTY_TYPE_CHOICES = (
-        ('supplier', 'Supplier'),
-        ('customer', 'Customer'),
-        ('both', 'Supplier & Customer'),
-    )
-
+    PARTY_TYPE_CHOICES = (('supplier', 'Supplier'), ('customer', 'Customer'), ('both', 'Supplier & Customer'))
     name = models.CharField(max_length=200)
     party_type = models.CharField(max_length=20, choices=PARTY_TYPE_CHOICES, default='supplier')
     phone = models.CharField(max_length=50, blank=True)
@@ -45,19 +43,30 @@ class Party(AuthorizationAuditModel):
     def __str__(self):
         return self.name
 
+    @property
+    def can_supply(self):
+        return self.party_type in {'supplier', 'both'}
+
+    @property
+    def can_buy(self):
+        return self.party_type in {'customer', 'both'}
+
 
 class Product(AuthorizationAuditModel):
+    sku = models.CharField(max_length=80, unique=True, null=True, blank=True)
+    barcode = models.CharField(max_length=120, unique=True, null=True, blank=True)
     name = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
     unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    pack_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    unit_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    quantity = models.DecimalField(max_digits=15, decimal_places=2, default=0, editable=False)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
+    pack_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
+    unit_sale_price = models.DecimalField(max_digits=12, decimal_places=2, default=0, validators=[MinValueValidator(Decimal('0'))])
     description = models.TextField(blank=True)
 
     class Meta:
         permissions = build_model_permissions('product', 'product')
+        indexes = [models.Index(fields=['name']), models.Index(fields=['sku']), models.Index(fields=['barcode'])]
 
     def __str__(self):
         return self.name

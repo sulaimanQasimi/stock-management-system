@@ -1,10 +1,11 @@
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models, transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
-from authorization.models import AuthorizationAuditModel, build_model_permissions
+from authorization.models import AuthorizationActivityLog, AuthorizationAuditModel, build_model_permissions
 from .constants import ZERO
 from .core import Product
 
@@ -26,26 +27,15 @@ class StockMovement(AuthorizationAuditModel):
     INCREASE = 'increase'
     DECREASE = 'decrease'
     TRANSFER = 'transfer'
-
-    MOVEMENT_TYPE_CHOICES = (
-        (INCREASE, 'Increase'),
-        (DECREASE, 'Decrease'),
-        (TRANSFER, 'Transfer'),
-    )
-
+    MOVEMENT_TYPE_CHOICES = ((INCREASE, 'Increase'), (DECREASE, 'Decrease'), (TRANSFER, 'Transfer'))
     SOURCE_MANUAL = 'manual'
     SOURCE_PURCHASE = 'purchase'
     SOURCE_SALE = 'sale'
-
-    SOURCE_TYPE_CHOICES = (
-        (SOURCE_MANUAL, 'Manual'),
-        (SOURCE_PURCHASE, 'Purchase'),
-        (SOURCE_SALE, 'Sale'),
-    )
+    SOURCE_TYPE_CHOICES = ((SOURCE_MANUAL, 'Manual'), (SOURCE_PURCHASE, 'Purchase'), (SOURCE_SALE, 'Sale'))
 
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='stock_movements')
     movement_type = models.CharField(max_length=20, choices=MOVEMENT_TYPE_CHOICES)
-    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+    quantity = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     from_department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='stock_out', null=True, blank=True)
     to_department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='stock_in', null=True, blank=True)
     source_type = models.CharField(max_length=20, choices=SOURCE_TYPE_CHOICES, default=SOURCE_MANUAL)
@@ -59,6 +49,8 @@ class StockMovement(AuthorizationAuditModel):
     class Meta:
         ordering = ['-movement_date', '-id']
         permissions = build_model_permissions('stockmovement', 'stock movement')
+        indexes = [models.Index(fields=['product', 'movement_type']), models.Index(fields=['source_type', 'source_id', 'source_line_id', 'movement_type']), models.Index(fields=['movement_date']), models.Index(fields=['from_department', 'to_department'])]
+        constraints = [models.CheckConstraint(check=Q(quantity__gt=0), name='stock_movement_quantity_positive')]
 
     def __str__(self):
         return f'{self.get_movement_type_display()} {self.quantity} {self.product}'
@@ -76,56 +68,50 @@ class StockMovement(AuthorizationAuditModel):
         return increased - decreased
 
     @classmethod
+    def department_quantity(cls, product, department):
+        incoming = cls.objects.filter(product=product, to_department=department).aggregate(total=Sum('quantity'))['total'] or ZERO
+        outgoing = cls.objects.filter(product=product, from_department=department).aggregate(total=Sum('quantity'))['total'] or ZERO
+        return incoming - outgoing
+
+    @classmethod
     def sync_product_quantity(cls, product):
         product.quantity = cls.ledger_quantity(product)
         product.save(update_fields=['quantity', 'updated_at'])
         return product.quantity
 
     @classmethod
-    def posted_quantity(cls, *, source_type, source_line_id, movement_type):
-        return cls.objects.filter(
-            source_type=source_type,
-            source_line_id=source_line_id,
-            movement_type=movement_type,
-        ).aggregate(total=Sum('quantity'))['total'] or ZERO
+    def posted_quantity(cls, *, product, source_type, source_id, source_line_id, movement_type):
+        return cls.objects.filter(product=product, source_type=source_type, source_id=source_id, source_line_id=source_line_id, movement_type=movement_type).aggregate(total=Sum('quantity'))['total'] or ZERO
 
     @classmethod
     def post_delta(cls, *, product, movement_type, target_quantity, source_type, source_id=None, source_line_id=None, reference_number='', reason='', note='', user=None):
-        if target_quantity is None:
-            target_quantity = ZERO
-        target_quantity = Decimal(str(target_quantity))
-        posted = cls.posted_quantity(source_type=source_type, source_line_id=source_line_id, movement_type=movement_type)
+        if source_type != cls.SOURCE_MANUAL and (source_id is None or source_line_id is None):
+            raise ValidationError('System stock movements require source_id and source_line_id.')
+        target_quantity = ZERO if target_quantity is None else Decimal(str(target_quantity))
+        posted = cls.posted_quantity(product=product, source_type=source_type, source_id=source_id, source_line_id=source_line_id, movement_type=movement_type)
         delta = target_quantity - posted
         if delta == ZERO:
             cls.sync_product_quantity(product)
             return None
-
         correcting_type = movement_type
         correcting_quantity = delta
         if delta < ZERO:
             correcting_type = cls.DECREASE if movement_type == cls.INCREASE else cls.INCREASE
             correcting_quantity = abs(delta)
-
-        movement = cls(
-            product=product,
-            movement_type=correcting_type,
-            quantity=correcting_quantity,
-            source_type=source_type,
-            source_id=source_id,
-            source_line_id=source_line_id,
-            reference_number=reference_number,
-            reason=reason,
-            note=note,
-        )
+        movement = cls(product=product, movement_type=correcting_type, quantity=correcting_quantity, source_type=source_type, source_id=source_id, source_line_id=source_line_id, reference_number=reference_number, reason=reason, note=note)
         movement.set_created_user(user)
         movement.set_updated_user(user)
-        movement.save(skip_stock_check=True)
+        movement.save()
         return movement
 
     def clean(self):
         super().clean()
         if self.quantity is None or self.quantity <= Decimal('0'):
             raise ValidationError({'quantity': 'Quantity must be greater than zero.'})
+        if self.source_type == self.SOURCE_MANUAL and (self.source_id or self.source_line_id):
+            raise ValidationError('Manual stock movements cannot have source references.')
+        if self.source_type != self.SOURCE_MANUAL and (not self.source_id or not self.source_line_id):
+            raise ValidationError('System stock movements require source references.')
         if self.source_type == self.SOURCE_MANUAL:
             if self.movement_type == self.INCREASE and not self.to_department_id:
                 raise ValidationError({'to_department': 'Select the department receiving the stock.'})
@@ -138,15 +124,15 @@ class StockMovement(AuthorizationAuditModel):
                     raise ValidationError({'to_department': 'Transfer departments must be different.'})
 
     def save(self, *args, **kwargs):
-        skip_stock_check = kwargs.pop('skip_stock_check', False)
         if self.pk:
             raise ValidationError('Stock movements cannot be edited after posting. Create a correcting movement instead.')
         self.full_clean()
         with transaction.atomic():
             product = Product.objects.select_for_update().get(pk=self.product_id)
-            if not skip_stock_check and self.movement_type in [self.DECREASE, self.TRANSFER]:
-                available = self.ledger_quantity(product)
+            if self.movement_type in [self.DECREASE, self.TRANSFER]:
+                available = self.department_quantity(product, self.from_department) if self.from_department_id else self.ledger_quantity(product)
                 if available < self.quantity:
-                    raise ValidationError({'quantity': 'Cannot move more stock than the product currently has.'})
+                    raise ValidationError({'quantity': 'Cannot move more stock than is currently available.'})
             super().save(*args, **kwargs)
             self.sync_product_quantity(product)
+            AuthorizationActivityLog.log(self, 'create', self.created_by)
