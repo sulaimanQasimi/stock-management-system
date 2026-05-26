@@ -7,6 +7,25 @@ from django.utils import timezone
 User = get_user_model()
 
 
+def build_model_permissions(model_name, verbose_name):
+    return [
+        (f'view_all_{model_name}', f'Can view all {verbose_name} records'),
+        (f'view_single_{model_name}', f'Can view single {verbose_name} record'),
+        (f'view_own_{model_name}', f'Can view own {verbose_name} records'),
+        (f'create_{model_name}', f'Can create {verbose_name} records'),
+        (f'edit_{model_name}', f'Can edit all {verbose_name} records'),
+        (f'edit_own_{model_name}', f'Can edit own {verbose_name} records'),
+        (f'delete_{model_name}', f'Can delete all {verbose_name} records'),
+        (f'delete_own_{model_name}', f'Can delete own {verbose_name} records'),
+        (f'trash_{model_name}', f'Can trash all {verbose_name} records'),
+        (f'trash_own_{model_name}', f'Can trash own {verbose_name} records'),
+        (f'restore_{model_name}', f'Can restore all {verbose_name} records'),
+        (f'restore_own_{model_name}', f'Can restore own {verbose_name} records'),
+        (f'force_delete_{model_name}', f'Can force delete all {verbose_name} records'),
+        (f'force_delete_own_{model_name}', f'Can force delete own {verbose_name} records'),
+    ]
+
+
 class AuthorizedQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_trashed=False)
@@ -21,11 +40,14 @@ class AuthorizedQuerySet(models.QuerySet):
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
 
-        if user.has_perm(f'{app_label}.{action}_all_{model_name}'):
+        if user.has_perm(f'{app_label}.{action}_all_{model_name}') or user.has_perm(f'{app_label}.{action}_{model_name}'):
             return self
 
         if user.has_perm(f'{app_label}.{action}_own_{model_name}'):
             return self.filter(created_by=user)
+
+        if action == 'view' and user.has_perm(f'{app_label}.view_single_{model_name}'):
+            return self
 
         return self.none()
 
@@ -65,20 +87,6 @@ class AuthorizationAuditModel(models.Model):
 
     class Meta:
         abstract = True
-        permissions = [
-            ('view_all_records', 'Can view all records'),
-            ('view_own_records', 'Can view own records'),
-            ('view_single_records', 'Can view single records'),
-            ('edit_all_records', 'Can edit all records'),
-            ('edit_own_records', 'Can edit own records'),
-            ('create_records', 'Can create records'),
-            ('trash_all_records', 'Can trash all records'),
-            ('trash_own_records', 'Can trash own records'),
-            ('restore_all_records', 'Can restore all records'),
-            ('restore_own_records', 'Can restore own records'),
-            ('force_delete_all_records', 'Can force delete all records'),
-            ('force_delete_own_records', 'Can force delete own records'),
-        ]
 
     def set_created_user(self, user):
         if user and user.is_authenticated and not self.created_by_id:
@@ -118,24 +126,30 @@ class PermissionLabel(models.Model):
     ACTION_CHOICES = (
         ('view_all', 'View all'),
         ('view_single', 'View single'),
-        ('edit', 'Edit'),
+        ('view_own', 'View own / personal'),
         ('create', 'Create'),
+        ('edit', 'Edit'),
+        ('edit_own', 'Edit own / personal'),
         ('delete', 'Delete'),
+        ('delete_own', 'Delete own / personal'),
         ('trash', 'Trash'),
+        ('trash_own', 'Trash own / personal'),
         ('restore', 'Restore'),
+        ('restore_own', 'Restore own / personal'),
         ('force_delete', 'Force delete'),
+        ('force_delete_own', 'Force delete own / personal'),
     )
 
-    SCOPE_CHOICES = (
-        ('all', 'All / full access'),
-        ('own', 'Own / personal access'),
-        ('single', 'Single record access'),
+    LEVEL_CHOICES = (
+        ('all', 'All / director level'),
+        ('own', 'Own / personal level'),
+        ('single', 'Single record level'),
     )
 
     app_label = models.CharField(max_length=100)
     model_name = models.CharField(max_length=100)
     action = models.CharField(max_length=50, choices=ACTION_CHOICES)
-    scope = models.CharField(max_length=50, choices=SCOPE_CHOICES, default='all')
+    level = models.CharField(max_length=50, choices=LEVEL_CHOICES, default='all')
     codename = models.CharField(max_length=150, unique=True)
 
     label_en = models.CharField(max_length=200)
@@ -148,8 +162,8 @@ class PermissionLabel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['app_label', 'model_name', 'action', 'scope']
-        unique_together = ('app_label', 'model_name', 'action', 'scope')
+        ordering = ['app_label', 'model_name', 'action', 'level']
+        unique_together = ('app_label', 'model_name', 'action', 'level')
 
     def __str__(self):
         return f'{self.app_label}.{self.model_name}: {self.label_en}'
