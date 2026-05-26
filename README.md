@@ -1,2 +1,3 @@
-# stock-management-system
-Django-based Stock Management System with products, units, and categories
+## Stock Management System
+
+Django project with Inertia.js + React + Tailwind frontend.
