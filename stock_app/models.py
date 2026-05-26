@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -110,6 +111,14 @@ class PurchaseItem(models.Model):
     def __str__(self):
         return f"{self.product} - {self.quantity} {self.piece_or_pack}"
 
+    @property
+    def sold_base_unit(self):
+        return self.sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or Decimal('0.00')
+
+    @property
+    def remaining_base_unit(self):
+        return self.total_base_unit - self.sold_base_unit
+
     def save(self, *args, **kwargs):
         if self.piece_or_pack == 'pack':
             self.total_base_unit = self.quantity * self.per_pack
@@ -131,3 +140,107 @@ class PurchasePayment(models.Model):
 
     def __str__(self):
         return f"Payment for {self.purchase.batch_number}"
+
+
+class Sale(models.Model):
+    sale_number = models.CharField(max_length=100, unique=True)
+    date = models.DateField()
+    party = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='sales')
+    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sales')
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    discount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    net_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    reference_number = models.CharField(max_length=100, blank=True)
+    invoice_number = models.CharField(max_length=100, blank=True)
+    note = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_created')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_updated')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date', '-id']
+
+    def __str__(self):
+        return f"Sale {self.sale_number}"
+
+    def update_total(self):
+        total = self.items.aggregate(total=models.Sum('total'))['total'] or Decimal('0.00')
+        self.total = total
+        self.net_total = total - self.discount
+        self.save(update_fields=['total', 'net_total', 'updated_at'])
+        return self.net_total
+
+
+class SaleItem(models.Model):
+    SALE_UNIT_CHOICES = (
+        ('piece', 'Piece'),
+        ('pack', 'Pack'),
+    )
+
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='items')
+    purchase_item = models.ForeignKey(PurchaseItem, on_delete=models.PROTECT, related_name='sale_items')
+    purchase_batch = models.ForeignKey(PurchaseBatch, on_delete=models.PROTECT, related_name='sale_items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='sale_items')
+    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+    pack_or_piece = models.CharField(max_length=10, choices=SALE_UNIT_CHOICES, default='piece')
+    per_pack = models.DecimalField(max_digits=12, decimal_places=2, default=1)
+    total_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.product} - {self.quantity} {self.pack_or_piece}"
+
+    def clean(self):
+        if self.purchase_item_id:
+            if self.product_id and self.product_id != self.purchase_item.product_id:
+                raise ValidationError('Selected product must match the selected purchase item product.')
+            if self.purchase_batch_id and self.purchase_batch_id != self.purchase_item.purchase_id:
+                raise ValidationError('Selected purchase batch must match the selected purchase item batch.')
+
+            current_base_unit = Decimal('0.00')
+            if self.pk:
+                old_item = SaleItem.objects.filter(pk=self.pk).first()
+                if old_item:
+                    current_base_unit = old_item.total_base_unit
+
+            available = self.purchase_item.remaining_base_unit + current_base_unit
+            if self.total_base_unit > available:
+                raise ValidationError('Sale quantity is greater than the remaining quantity in this purchase item.')
+
+    def save(self, *args, **kwargs):
+        self.product = self.purchase_item.product
+        self.purchase_batch = self.purchase_item.purchase
+
+        if self.pack_or_piece == 'pack':
+            self.per_pack = self.purchase_item.per_pack
+            self.total_base_unit = self.quantity * self.per_pack
+            self.unit_price = self.product.pack_sale_price
+        else:
+            self.total_base_unit = self.quantity
+            self.unit_price = self.product.unit_sale_price
+
+        self.total = self.quantity * self.unit_price
+        self.clean()
+        super().save(*args, **kwargs)
+        self.sale.update_total()
+
+
+class SalePayment(models.Model):
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='payments')
+    account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='sale_payments')
+    transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='sale_payment')
+    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payments')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Payment for {self.sale.sale_number}"
