@@ -117,12 +117,26 @@ class SaleItem(AuthorizationAuditModel):
         super().save(*args, **kwargs)
         self.sale.update_total()
 
+        from .stock import StockMovement
+        StockMovement.post_delta(
+            product=self.product,
+            movement_type=StockMovement.DECREASE,
+            target_quantity=self.total_base_unit,
+            source_type=StockMovement.SOURCE_SALE,
+            source_id=self.sale_id,
+            source_line_id=self.id,
+            reference_number=self.sale.sale_number,
+            reason='Sale stock issued',
+            note=self.note,
+            user=self.updated_by or self.created_by,
+        )
+
 
 class SalePayment(AuthorizationAuditModel):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='payments')
     account = models.ForeignKey('finance.Account', on_delete=models.PROTECT, related_name='sale_payments')
     transaction = models.OneToOneField('finance.Transaction', on_delete=models.PROTECT, related_name='sale_payment')
-    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payments')
+    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='sale_payment')
     amount = models.DecimalField(max_digits=15, decimal_places=2)
 
     class Meta:
