@@ -1,9 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
 from inertia import render_inertia
 
 from finance.models import Account, Currency, Expense, ExpenseType, Transaction
 from .models import (
     Category,
+    Department,
     Party,
     Product,
     PurchaseBatch,
@@ -12,6 +15,7 @@ from .models import (
     Sale,
     SaleItem,
     SalePayment,
+    StockMovement,
     StockProfitReport,
     Unit,
 )
@@ -33,6 +37,7 @@ def _common_options():
         'units': _options(Unit.objects.order_by('name')),
         'parties': _options(Party.objects.order_by('name')),
         'products': _options(Product.objects.order_by('name')),
+        'departments': _options(Department.objects.order_by('name')),
         'currencies': _options(Currency.objects.order_by('code'), 'code'),
         'accounts': _options(Account.objects.order_by('code'), 'name'),
         'transactions': [{'value': item.id, 'label': str(item)} for item in Transaction.objects.order_by('-created_at')[:200]],
@@ -50,6 +55,21 @@ def _render_index(request, page, prop, queryset, fields):
     })
 
 
+def _can(user, action, model_name):
+    if not user.is_authenticated:
+        return False
+    return (
+        user.is_superuser
+        or user.has_perm(f'stock_app.{action}_{model_name}')
+        or user.has_perm(f'stock_app.{action}_all_{model_name}')
+        or user.has_perm(f'stock_app.{action}_own_{model_name}')
+    )
+
+
+def _permission_denied_page(request, title='Permission denied'):
+    return render_inertia(request, 'PermissionDenied', {'title': title})
+
+
 def dashboard(request):
     return render_inertia(request, 'Dashboard', {
         'cards': [
@@ -64,6 +84,80 @@ def dashboard(request):
 def users_index(request):
     users = User.objects.filter(is_active=True).order_by('username').values('id', 'username', 'email')
     return render_inertia(request, 'Users', {'users': list(users)})
+
+
+def departments_index(request):
+    if not _can(request.user, 'view', 'department'):
+        return _permission_denied_page(request, 'Departments permission required')
+
+    if request.method == 'POST':
+        if not _can(request.user, 'create', 'department'):
+            return _permission_denied_page(request, 'Create department permission required')
+        department = Department(
+            name=request.POST.get('name', '').strip(),
+            code=request.POST.get('code', '').strip(),
+            description=request.POST.get('description', '').strip(),
+        )
+        department.set_created_user(request.user)
+        department.set_updated_user(request.user)
+        department.save()
+        return redirect('departments.index')
+
+    return _render_index(request, 'Departments', 'departments', Department.objects.for_user(request.user), ['id', 'name', 'code', 'description'])
+
+
+def stock_movements_index(request):
+    if not _can(request.user, 'view', 'stockmovement'):
+        return _permission_denied_page(request, 'Stock movement permission required')
+
+    if request.method == 'POST':
+        if not _can(request.user, 'create', 'stockmovement'):
+            return _permission_denied_page(request, 'Create stock movement permission required')
+        movement = StockMovement(
+            product_id=request.POST.get('product'),
+            movement_type=request.POST.get('movement_type'),
+            quantity=request.POST.get('quantity'),
+            from_department_id=request.POST.get('from_department') or None,
+            to_department_id=request.POST.get('to_department') or None,
+            reference_number=request.POST.get('reference_number', '').strip(),
+            reason=request.POST.get('reason', '').strip(),
+            note=request.POST.get('note', '').strip(),
+        )
+        movement.set_created_user(request.user)
+        movement.set_updated_user(request.user)
+        try:
+            movement.save()
+        except ValidationError as exc:
+            movements = StockMovement.objects.for_user(request.user).select_related('product', 'from_department', 'to_department')
+            return render_inertia(request, 'StockMovements', {
+                'stockMovements': _stock_movement_rows(movements),
+                'options': _common_options(),
+                'errors': exc.message_dict if hasattr(exc, 'message_dict') else {'stock': exc.messages},
+            })
+        return redirect('stock-movements.index')
+
+    movements = StockMovement.objects.for_user(request.user).select_related('product', 'from_department', 'to_department')
+    return render_inertia(request, 'StockMovements', {
+        'stockMovements': _stock_movement_rows(movements),
+        'options': _common_options(),
+    })
+
+
+def _stock_movement_rows(queryset):
+    return [
+        {
+            'id': item.id,
+            'product': item.product.name,
+            'movement_type': item.movement_type,
+            'quantity': item.quantity,
+            'from_department': item.from_department.name if item.from_department else '',
+            'to_department': item.to_department.name if item.to_department else '',
+            'reference_number': item.reference_number,
+            'reason': item.reason,
+            'movement_date': item.movement_date,
+        }
+        for item in queryset
+    ]
 
 
 def categories_index(request):
