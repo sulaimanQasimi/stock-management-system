@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from inertia import render_inertia
 
 from finance.models import Account, Currency, Expense, ExpenseType, Transaction
@@ -14,6 +15,8 @@ from .models import (
     StockProfitReport,
     Unit,
 )
+
+User = get_user_model()
 
 
 def _rows(queryset, *fields):
@@ -56,6 +59,11 @@ def dashboard(request):
             {'label': 'Accounts', 'value': Account.objects.count()},
         ]
     })
+
+
+def users_index(request):
+    users = User.objects.filter(is_active=True).order_by('username').values('id', 'username', 'email')
+    return render_inertia(request, 'Users', {'users': list(users)})
 
 
 def categories_index(request):
