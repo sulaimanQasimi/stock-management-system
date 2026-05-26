@@ -7,6 +7,9 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+ZERO = Decimal('0.00')
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -57,6 +60,26 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def total_bought_base_unit(self):
+        return self.purchase_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+
+    @property
+    def total_sold_base_unit(self):
+        return self.sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+
+    @property
+    def total_sales_amount(self):
+        return self.sale_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+
+    @property
+    def total_cost_of_goods_sold(self):
+        return self.sale_items.aggregate(total=models.Sum('cost_total'))['total'] or ZERO
+
+    @property
+    def gross_profit(self):
+        return self.total_sales_amount - self.total_cost_of_goods_sold
+
 
 class PurchaseBatch(models.Model):
     batch_number = models.CharField(max_length=100, unique=True)
@@ -79,10 +102,38 @@ class PurchaseBatch(models.Model):
         return f"Purchase {self.batch_number}"
 
     def update_total(self):
-        total = self.items.aggregate(total=models.Sum('total'))['total'] or Decimal('0.00')
+        total = self.items.aggregate(total=models.Sum('total'))['total'] or ZERO
         self.total = total
         self.save(update_fields=['total', 'updated_at'])
         return self.total
+
+    @property
+    def bought_base_unit(self):
+        return self.items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+
+    @property
+    def sold_base_unit(self):
+        return self.sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+
+    @property
+    def remaining_base_unit(self):
+        return self.bought_base_unit - self.sold_base_unit
+
+    @property
+    def sales_amount(self):
+        return self.sale_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+
+    @property
+    def cost_of_goods_sold(self):
+        return self.sale_items.aggregate(total=models.Sum('cost_total'))['total'] or ZERO
+
+    @property
+    def gross_profit(self):
+        return self.sales_amount - self.cost_of_goods_sold
+
+    @property
+    def remaining_stock_value(self):
+        return self.items.aggregate(total=models.Sum('remaining_cost_value'))['total'] or ZERO
 
 
 class PurchaseItem(models.Model):
@@ -113,11 +164,33 @@ class PurchaseItem(models.Model):
 
     @property
     def sold_base_unit(self):
-        return self.sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or Decimal('0.00')
+        return self.sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
 
     @property
     def remaining_base_unit(self):
         return self.total_base_unit - self.sold_base_unit
+
+    @property
+    def cost_per_base_unit(self):
+        if not self.total_base_unit:
+            return ZERO
+        return self.total / self.total_base_unit
+
+    @property
+    def sales_amount(self):
+        return self.sale_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+
+    @property
+    def cost_of_goods_sold(self):
+        return self.sale_items.aggregate(total=models.Sum('cost_total'))['total'] or ZERO
+
+    @property
+    def gross_profit(self):
+        return self.sales_amount - self.cost_of_goods_sold
+
+    @property
+    def remaining_cost_value(self):
+        return self.remaining_base_unit * self.cost_per_base_unit
 
     def save(self, *args, **kwargs):
         if self.piece_or_pack == 'pack':
@@ -165,11 +238,25 @@ class Sale(models.Model):
         return f"Sale {self.sale_number}"
 
     def update_total(self):
-        total = self.items.aggregate(total=models.Sum('total'))['total'] or Decimal('0.00')
+        total = self.items.aggregate(total=models.Sum('total'))['total'] or ZERO
         self.total = total
         self.net_total = total - self.discount
         self.save(update_fields=['total', 'net_total', 'updated_at'])
         return self.net_total
+
+    @property
+    def cost_of_goods_sold(self):
+        return self.items.aggregate(total=models.Sum('cost_total'))['total'] or ZERO
+
+    @property
+    def gross_profit(self):
+        return self.net_total - self.cost_of_goods_sold
+
+    @property
+    def profit_margin_percent(self):
+        if not self.net_total:
+            return ZERO
+        return (self.gross_profit / self.net_total) * Decimal('100')
 
 
 class SaleItem(models.Model):
@@ -188,6 +275,10 @@ class SaleItem(models.Model):
     total_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    cost_per_base_unit = models.DecimalField(max_digits=15, decimal_places=6, default=0)
+    cost_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    gross_profit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    profit_margin_percent = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -205,7 +296,7 @@ class SaleItem(models.Model):
             if self.purchase_batch_id and self.purchase_batch_id != self.purchase_item.purchase_id:
                 raise ValidationError('Selected purchase batch must match the selected purchase item batch.')
 
-            current_base_unit = Decimal('0.00')
+            current_base_unit = ZERO
             if self.pk:
                 old_item = SaleItem.objects.filter(pk=self.pk).first()
                 if old_item:
@@ -228,6 +319,10 @@ class SaleItem(models.Model):
             self.unit_price = self.product.unit_sale_price
 
         self.total = self.quantity * self.unit_price
+        self.cost_per_base_unit = self.purchase_item.cost_per_base_unit
+        self.cost_total = self.total_base_unit * self.cost_per_base_unit
+        self.gross_profit = self.total - self.cost_total
+        self.profit_margin_percent = ZERO if not self.total else (self.gross_profit / self.total) * Decimal('100')
         self.clean()
         super().save(*args, **kwargs)
         self.sale.update_total()
@@ -244,3 +339,77 @@ class SalePayment(models.Model):
 
     def __str__(self):
         return f"Payment for {self.sale.sale_number}"
+
+
+class StockProfitReport(models.Model):
+    REPORT_SCOPE_CHOICES = (
+        ('general', 'General'),
+        ('batch', 'Purchase Batch'),
+        ('product', 'Product'),
+    )
+
+    report_scope = models.CharField(max_length=20, choices=REPORT_SCOPE_CHOICES, default='general')
+    purchase_batch = models.ForeignKey(PurchaseBatch, on_delete=models.SET_NULL, null=True, blank=True, related_name='profit_reports')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='profit_reports')
+    currency = models.ForeignKey('finance.Currency', on_delete=models.PROTECT, related_name='stock_profit_reports')
+    date_from = models.DateField(null=True, blank=True)
+    date_to = models.DateField(null=True, blank=True)
+
+    total_bought_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_sold_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_remaining_base_unit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_purchase_cost = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_cost_of_goods_sold = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_sales = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    gross_profit = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    profit_margin_percent = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    remaining_stock_value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+
+    note = models.TextField(blank=True)
+    generated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='stock_profit_reports_generated')
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-generated_at']
+
+    def __str__(self):
+        if self.report_scope == 'batch' and self.purchase_batch:
+            return f"Profit Report - Batch {self.purchase_batch.batch_number}"
+        if self.report_scope == 'product' and self.product:
+            return f"Profit Report - Product {self.product.name}"
+        return 'Profit Report - General'
+
+    def calculate(self):
+        purchase_items = PurchaseItem.objects.all()
+        sale_items = SaleItem.objects.all()
+
+        if self.purchase_batch_id:
+            purchase_items = purchase_items.filter(purchase=self.purchase_batch)
+            sale_items = sale_items.filter(purchase_batch=self.purchase_batch)
+
+        if self.product_id:
+            purchase_items = purchase_items.filter(product=self.product)
+            sale_items = sale_items.filter(product=self.product)
+
+        if self.date_from:
+            purchase_items = purchase_items.filter(purchase__date__gte=self.date_from)
+            sale_items = sale_items.filter(sale__date__gte=self.date_from)
+
+        if self.date_to:
+            purchase_items = purchase_items.filter(purchase__date__lte=self.date_to)
+            sale_items = sale_items.filter(sale__date__lte=self.date_to)
+
+        self.total_bought_base_unit = purchase_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+        self.total_sold_base_unit = sale_items.aggregate(total=models.Sum('total_base_unit'))['total'] or ZERO
+        self.total_remaining_base_unit = self.total_bought_base_unit - self.total_sold_base_unit
+        self.total_purchase_cost = purchase_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+        self.total_cost_of_goods_sold = sale_items.aggregate(total=models.Sum('cost_total'))['total'] or ZERO
+        self.total_sales = sale_items.aggregate(total=models.Sum('total'))['total'] or ZERO
+        self.gross_profit = self.total_sales - self.total_cost_of_goods_sold
+        self.profit_margin_percent = ZERO if not self.total_sales else (self.gross_profit / self.total_sales) * Decimal('100')
+        self.remaining_stock_value = self.total_purchase_cost - self.total_cost_of_goods_sold
+        return self
+
+    def save(self, *args, **kwargs):
+        self.calculate()
+        super().save(*args, **kwargs)
