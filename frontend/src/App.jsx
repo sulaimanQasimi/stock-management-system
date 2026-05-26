@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import './styles.css';
 
-const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
+const jsxPages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
+const tsxPages = import.meta.glob('./Pages/**/*.tsx', { eager: true });
+const pages = { ...jsxPages, ...tsxPages };
 
 createInertiaApp({
   resolve: (name) => {
-    const page = pages[`./Pages/${name}.jsx`];
+    const page = pages[`./Pages/${name}.tsx`] || pages[`./Pages/${name}.jsx`];
     if (!page) {
       throw new Error(`Page not found: ${name}`);
     }
