@@ -1,0 +1,20 @@
+{
+  "auth.users": "کاربران",
+  "auth.user": "کاربر",
+  "auth.username": "نام کاربری",
+  "auth.email": "ایمیل",
+  "auth.permissions": "اجازه‌ها",
+  "auth.permissionDenied": "اجازه رد شد",
+  "auth.accessRestricted": "دسترسی محدود است",
+  "auth.permissionDeniedDescription": "شما اجازه مشاهده یا انجام این عمل را ندارید.",
+  "auth.askAdmin": "از مدیر بخواهید اجازه لازم StockUp را برای این صفحه یا عمل بدهد.",
+  "auth.goDashboard": "رفتن به داشبورد",
+  "auth.goBack": "بازگشت",
+  "auth.activeUsers": "کاربران فعال",
+  "auth.createdBy": "ایجاد شده توسط",
+  "auth.updatedBy": "به‌روزرسانی شده توسط",
+  "auth.createdAt": "تاریخ ایجاد",
+  "auth.updatedAt": "تاریخ به‌روزرسانی",
+  "auth.auditTrail": "ردیابی بررسی",
+  "auth.activityLog": "گزارش فعالیت"
+}
