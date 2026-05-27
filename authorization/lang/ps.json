@@ -1,0 +1,20 @@
+{
+  "auth.users": "کاروونکي",
+  "auth.user": "کاروونکی",
+  "auth.username": "کارن نوم",
+  "auth.email": "برېښنالیک",
+  "auth.permissions": "اجازې",
+  "auth.permissionDenied": "اجازه رد شوه",
+  "auth.accessRestricted": "لاسرسی محدود دی",
+  "auth.permissionDeniedDescription": "تاسو د دې عمل د لیدلو یا ترسره کولو اجازه نه لرئ.",
+  "auth.askAdmin": "له مدیر څخه وغواړئ چې د دې پاڼې یا عمل لپاره د StockUp اړینه اجازه درکړي.",
+  "auth.goDashboard": "ډشبورډ ته لاړ شئ",
+  "auth.goBack": "شاته لاړ شئ",
+  "auth.activeUsers": "فعال کاروونکي",
+  "auth.createdBy": "جوړ شوی د",
+  "auth.updatedBy": "تازه شوی د",
+  "auth.createdAt": "د جوړېدو نېټه",
+  "auth.updatedAt": "د تازه کېدو نېټه",
+  "auth.auditTrail": "د پلټنې لړۍ",
+  "auth.activityLog": "د فعالیت لاګ"
+}
