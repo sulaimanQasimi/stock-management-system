@@ -1,0 +1,20 @@
+{
+  "auth.users": "Users",
+  "auth.user": "User",
+  "auth.username": "Username",
+  "auth.email": "Email",
+  "auth.permissions": "Permissions",
+  "auth.permissionDenied": "Permission denied",
+  "auth.accessRestricted": "Access restricted",
+  "auth.permissionDeniedDescription": "You do not have permission to view or perform this action.",
+  "auth.askAdmin": "Ask an administrator to grant the required StockUp permission for this page or action.",
+  "auth.goDashboard": "Go to dashboard",
+  "auth.goBack": "Go back",
+  "auth.activeUsers": "Active users",
+  "auth.createdBy": "Created by",
+  "auth.updatedBy": "Updated by",
+  "auth.createdAt": "Created at",
+  "auth.updatedAt": "Updated at",
+  "auth.auditTrail": "Audit trail",
+  "auth.activityLog": "Activity log"
+}
