@@ -7,68 +7,41 @@ export function Field({ label, error, children }) {
     <label className="block space-y-1">
       <span className="text-sm font-medium text-slate-700">{label}</span>
       {children}
-      {error ? <span className="text-xs text-red-600">{error}</span> : null}
+      {error && <span className="text-xs text-red-600">{error}</span>}
     </label>
   );
 }
 
-export function TextInput({ label, error, ...props }) {
+function Control({ as: Component = 'input', label, error, className = '', ...props }) {
   return (
     <Field label={label} error={error}>
-      <input className={baseInputClass} {...props} />
+      <Component className={`${baseInputClass} ${className}`.trim()} {...props} />
     </Field>
   );
 }
 
-export function NumberInput({ label, error, ...props }) {
-  return (
-    <Field label={label} error={error}>
-      <input type="number" step="any" className={baseInputClass} {...props} />
-    </Field>
-  );
-}
-
-export function DateInput({ label, error, ...props }) {
-  return (
-    <Field label={label} error={error}>
-      <input type="date" className={baseInputClass} {...props} />
-    </Field>
-  );
-}
+export const TextInput = (props) => <Control {...props} />;
+export const NumberInput = (props) => <Control type="number" step="any" {...props} />;
+export const DateInput = (props) => <Control type="date" {...props} />;
+export const TextArea = (props) => <Control as="textarea" className="min-h-28" {...props} />;
 
 export function SelectInput({ label, options = [], error, placeholder = 'Select...', ...props }) {
   return (
-    <Field label={label} error={error}>
-      <select className={baseInputClass} {...props}>
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>{option.label}</option>
-        ))}
-      </select>
-    </Field>
+    <Control as="select" label={label} error={error} {...props}>
+      <option value="">{placeholder}</option>
+      {options.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+    </Control>
   );
 }
 
-export function TextArea({ label, error, ...props }) {
-  return (
-    <Field label={label} error={error}>
-      <textarea className={`${baseInputClass} min-h-28`} {...props} />
-    </Field>
-  );
+const buttonClass = {
+  primary: 'bg-slate-900 text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60',
+  secondary: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50',
+};
+
+function Button({ variant = 'primary', className = '', ...props }) {
+  return <button className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${buttonClass[variant]} ${className}`.trim()} {...props} />;
 }
 
-export function PrimaryButton({ children, ...props }) {
-  return (
-    <button className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60" {...props}>
-      {children}
-    </button>
-  );
-}
-
-export function SecondaryButton({ children, ...props }) {
-  return (
-    <button className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50" {...props}>
-      {children}
-    </button>
-  );
-}
+export const PrimaryButton = (props) => <Button {...props} />;
+export const SecondaryButton = (props) => <Button variant="secondary" {...props} />;
