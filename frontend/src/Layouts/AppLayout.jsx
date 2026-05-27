@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 const navigation = [
   { label: 'Dashboard', href: '/', icon: '◼' },
   { label: 'Operations', href: '/operations/', icon: '★' },
+  { label: 'Product Search', href: '/product-search/', icon: '⌕' },
   { label: 'Products', href: '/products/', icon: '□' },
   { label: 'Services', href: '/services/', icon: '◇' },
   { label: 'Stock Movements', href: '/stock-movements/', icon: '↕' },
