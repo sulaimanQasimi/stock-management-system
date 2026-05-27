@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
 from inertia import render_inertia
@@ -98,6 +99,31 @@ def operations_index(request):
 
 
 @login_required
+def product_search_index(request):
+    _require(request.user, 'view', Product)
+    query = request.GET.get('q', '').strip()
+    products = Product.objects.for_user(request.user).select_related('category', 'unit').order_by('name')
+
+    if query:
+        products = products.filter(Q(name__icontains=query) | Q(sku__icontains=query) | Q(barcode__icontains=query) | Q(category__name__icontains=query) | Q(description__icontains=query))
+
+    results = [{
+        'id': product.id,
+        'name': product.name,
+        'sku': product.sku or '',
+        'barcode': product.barcode or '',
+        'category': product.category.name if product.category else '',
+        'unit': product.unit.name if product.unit else '',
+        'quantity': str(product.quantity),
+        'price': str(product.price),
+        'packSalePrice': str(product.pack_sale_price),
+        'unitSalePrice': str(product.unit_sale_price),
+    } for product in products[:100]]
+
+    return render_inertia(request, 'ProductSearch', {'auth': _auth(request), 'query': query, 'products': results})
+
+
+@login_required
 def users_index(request):
     if not request.user.is_superuser and not request.user.has_perm('auth.view_user'):
         raise PermissionDenied
@@ -157,7 +183,7 @@ def _secured_index(view_name, prop, model, fields, order_by, options=(), app_lab
 categories_index = _secured_index('Categories', 'categories', Category, ['id', 'name', 'description'], ['name'])
 units_index = _secured_index('Units', 'units', Unit, ['id', 'name', 'abbreviation'], ['name'])
 parties_index = _secured_index('Parties', 'parties', Party, ['id', 'name', 'party_type', 'phone', 'address', 'description'], ['name'])
-products_index = _secured_index('Products', 'products', Product, ['id', 'name', 'quantity', 'price', 'pack_sale_price', 'unit_sale_price', 'description'], ['name'], ('categories', 'units'))
+products_index = _secured_index('Products', 'products', Product, ['id', 'name', 'sku', 'barcode', 'quantity', 'price', 'pack_sale_price', 'unit_sale_price', 'description'], ['name'], ('categories', 'units'))
 purchase_batches_index = _secured_index('PurchaseBatches', 'purchaseBatches', PurchaseBatch, ['id', 'batch_number', 'date', 'total', 'reference_number', 'invoice_number', 'note'], ['-date', '-id'], ('parties', 'currencies'))
 purchase_items_index = _secured_index('PurchaseItems', 'purchaseItems', PurchaseItem, ['id', 'quantity', 'piece_or_pack', 'per_pack', 'total_base_unit', 'unit_price', 'total', 'note'], ['-id'], ('products', 'units', 'purchaseBatches'))
 purchase_payments_index = _secured_index('PurchasePayments', 'purchasePayments', PurchasePayment, ['id'], ['-id'], ('accounts', 'currencies', 'transactions', 'purchaseBatches'))
