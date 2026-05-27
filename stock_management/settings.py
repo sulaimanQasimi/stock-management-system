@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -24,9 +25,11 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'stock_management.middleware.TenantDatabaseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'stock_management.middleware.TenantSessionProtectionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -54,27 +57,45 @@ WSGI_APPLICATION = 'stock_management.wsgi.application'
 DB_ENGINE = os.getenv('DB_ENGINE', 'mysql').lower()
 
 if DB_ENGINE == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.getenv('SQLITE_NAME', BASE_DIR / 'db.sqlite3'),
-        }
+    default_database = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.getenv('SQLITE_NAME', BASE_DIR / 'db.sqlite3'),
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('MYSQL_DATABASE', 'stock_management'),
-            'USER': os.getenv('MYSQL_USER', 'root'),
-            'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
-            'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
-            'PORT': os.getenv('MYSQL_PORT', '3306'),
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-        }
+    default_database = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DATABASE', 'stock_management'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
+        'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
+
+DATABASES = {
+    'default': default_database,
+}
+
+additional_databases = os.getenv('TENANT_DATABASES_JSON')
+
+if additional_databases:
+    DATABASES.update(json.loads(additional_databases))
+
+DEFAULT_TENANT_DATABASE = os.getenv('DEFAULT_TENANT_DATABASE', 'default')
+
+TENANT_DATABASE_ALIASES = [alias for alias in DATABASES.keys()]
+
+TENANT_DATABASE_LABELS = {
+    alias: alias.replace('_', ' ').title()
+    for alias in TENANT_DATABASE_ALIASES
+}
+
+DATABASE_ROUTERS = [
+    'stock_management.db_router.TenantDatabaseRouter',
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,5 +122,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
