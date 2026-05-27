@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods
 from inertia import render_inertia
 
 from finance.models import Account, Currency, Expense, ExpenseType, Transaction
+from stock_management.i18n import get_language_payload
 from .forms import DepartmentForm, StockMovementForm
 from .models import Category, Department, Party, Product, PurchaseBatch, PurchaseItem, PurchasePayment, Sale, SaleItem, SalePayment, StockMovement, StockProfitReport, Unit
 from .models import ProductReorderRule, ApprovalRequest, BusinessDocument, PartyLedgerEntry, ReturnRecord, StockAdjustmentReason, StockCountSession, ProductBatchTracking, CostingConfiguration, AdvancedReportRequest, ExportJob
@@ -55,7 +56,10 @@ def _common_options(user, keys=()):
 
 
 def _auth(request):
-    return {'user': {'username': request.user.get_username(), 'email': request.user.email}}
+    return {
+        'user': {'username': request.user.get_username(), 'email': request.user.email},
+        'i18n': get_language_payload(request),
+    }
 
 
 def _render_index(request, page, prop, queryset, fields, options=()):
@@ -65,10 +69,10 @@ def _render_index(request, page, prop, queryset, fields, options=()):
 @login_required
 def dashboard(request):
     return render_inertia(request, 'Dashboard', {'cards': [
-        {'label': 'Products', 'value': Product.objects.for_user(request.user).count()},
-        {'label': 'Purchases', 'value': PurchaseBatch.objects.for_user(request.user).count()},
-        {'label': 'Sales', 'value': Sale.objects.for_user(request.user).count()},
-        {'label': 'Accounts', 'value': Account.objects.for_user(request.user).count() if _can(request.user, 'view', 'account', 'finance') else 0},
+        {'label': 'Products', 'translationKey': 'nav.products', 'value': Product.objects.for_user(request.user).count()},
+        {'label': 'Purchases', 'translationKey': 'nav.purchases', 'value': PurchaseBatch.objects.for_user(request.user).count()},
+        {'label': 'Sales', 'translationKey': 'nav.sales', 'value': Sale.objects.for_user(request.user).count()},
+        {'label': 'Accounts', 'translationKey': 'finance.accounts', 'value': Account.objects.for_user(request.user).count() if _can(request.user, 'view', 'account', 'finance') else 0},
     ], 'auth': _auth(request)})
 
 
