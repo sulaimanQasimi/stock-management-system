@@ -3,34 +3,33 @@ import { useForm } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import { DateInput, NumberInput, PrimaryButton, SelectInput, TextArea, TextInput } from '../../Components/FormControls';
 
-function getDefaultValue(field) {
-  if (field.type === 'number') return 0;
-  return '';
-}
+const fieldComponents = {
+  select: SelectInput,
+  date: DateInput,
+  number: NumberInput,
+  textarea: TextArea,
+  text: TextInput,
+};
+
+const getDefaultValue = (field) => (field.type === 'number' ? 0 : '');
 
 function renderField(field, data, setData, errors, options) {
-  const common = {
-    label: field.label,
-    name: field.name,
-    value: data[field.name] ?? getDefaultValue(field),
-    error: errors[field.name],
-    onChange: (event) => setData(field.name, event.target.value),
-    required: field.required,
-  };
+  const Component = fieldComponents[field.type] || TextInput;
+  const extraProps = field.type === 'select'
+    ? { options: options[field.optionsKey] || field.options || [] }
+    : {};
 
-  if (field.type === 'select') {
-    return <SelectInput {...common} options={options[field.optionsKey] || field.options || []} />;
-  }
-  if (field.type === 'date') {
-    return <DateInput {...common} />;
-  }
-  if (field.type === 'number') {
-    return <NumberInput {...common} />;
-  }
-  if (field.type === 'textarea') {
-    return <TextArea {...common} />;
-  }
-  return <TextInput {...common} />;
+  return (
+    <Component
+      label={field.label}
+      name={field.name}
+      value={data[field.name] ?? getDefaultValue(field)}
+      error={errors[field.name]}
+      onChange={(event) => setData(field.name, event.target.value)}
+      required={field.required}
+      {...extraProps}
+    />
+  );
 }
 
 export default function ModelCrudPage({ title, subtitle, records = [], fields = [], columns = [], options = {}, routes = {}, initial = {} }) {
