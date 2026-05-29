@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
-from inertia import render_inertia
+from stock_management.inertia import render_inertia
 
 from .models import Sale, SaleServiceItem, Service
 

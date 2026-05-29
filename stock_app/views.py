@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from inertia import render_inertia
+from stock_management.inertia import render_inertia
 
 from finance.models import Account, Currency, Expense, ExpenseType, Transaction
 from stock_management.i18n import get_language_payload
