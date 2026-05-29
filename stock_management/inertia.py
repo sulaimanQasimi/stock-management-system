@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.conf import settings
 from django.middleware.csrf import get_token
@@ -6,6 +7,18 @@ from django.shortcuts import render
 
 
 def _vite_assets():
+    vite_dev_server_url = os.getenv('VITE_DEV_SERVER_URL', '').rstrip('/')
+
+    if settings.DEBUG and vite_dev_server_url:
+        return {
+            'dev': True,
+            'dev_server_url': vite_dev_server_url,
+            'js': None,
+            'js_content': None,
+            'css': [],
+            'css_content': [],
+        }
+
     dist_dir = settings.BASE_DIR / 'frontend' / 'dist'
     manifest_path = dist_dir / '.vite' / 'manifest.json'
 
@@ -27,10 +40,20 @@ def _vite_assets():
         except FileNotFoundError:
             js_content = None
 
+    css_content = []
+    for css_file in css_files:
+        try:
+            css_content.append((dist_dir / css_file).read_text())
+        except FileNotFoundError:
+            continue
+
     return {
+        'dev': False,
+        'dev_server_url': None,
         'js': js_file,
         'js_content': js_content,
         'css': css_files,
+        'css_content': css_content,
     }
 
 
