@@ -6,12 +6,16 @@ import './index.css';
 const appElement = document.getElementById('app');
 let initialPage = window.initialPage;
 
+if (typeof initialPage === 'string') {
+  initialPage = JSON.parse(initialPage);
+}
+
 if (!initialPage && appElement && appElement.dataset && appElement.dataset.page) {
   initialPage = JSON.parse(appElement.dataset.page);
 }
 
 if (!appElement || !initialPage || !initialPage.component) {
-  console.error('Missing Inertia initial page payload.', { appElement, initialPage });
+  throw new Error('Missing Inertia initial page payload. Check templates/app.html page_json rendering.');
 }
 
 createInertiaApp({
