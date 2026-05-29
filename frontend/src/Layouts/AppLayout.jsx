@@ -42,7 +42,7 @@ function NavLink({ item, active, onClick, t }) {
   );
 }
 
-export default function AppLayout({ title, subtitle, titleKey, subtitleKey, children }) {
+export default function AppLayout({ title, subtitle, titleKey = null, subtitleKey = null, children }) {
   const { url, props } = usePage();
   const { t, language, direction, available, setLanguage } = useI18n();
   const [open, setOpen] = useState(false);
