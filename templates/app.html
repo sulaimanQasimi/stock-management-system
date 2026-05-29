@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stock Management System</title>
+    <script>
+        window.initialPage = {{ page_json|safe }};
+    </script>
+    <script type="module" crossorigin src="{% static 'assets/index.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'assets/index.css' %}">
+</head>
+<body>
+    <div id="app" data-page='{{ page_json|escapejs }}'></div>
+</body>
+</html>
