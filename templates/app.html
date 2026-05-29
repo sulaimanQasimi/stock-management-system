@@ -6,22 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stock Management System</title>
 
+    {% if not vite_assets.dev %}
+        {% for css in vite_assets.css_content %}
+    <style>{{ css|safe }}</style>
+        {% endfor %}
+    {% endif %}
+</head>
+<body>
+    {{ page|json_script:"inertia-page" }}
+    <div id="app"></div>
+
     {% if vite_assets.dev %}
     <script type="module" src="{{ vite_assets.dev_server_url }}/@vite/client"></script>
     <script type="module" src="{{ vite_assets.dev_server_url }}/src/main.tsx"></script>
     {% else %}
-        {% for css in vite_assets.css_content %}
-    <style>{{ css|safe }}</style>
-        {% endfor %}
-
         {% if vite_assets.js_content %}
     <script type="module">{{ vite_assets.js_content|safe }}</script>
         {% elif vite_assets.js %}
     <script type="module" src="{% static vite_assets.js %}"></script>
         {% endif %}
     {% endif %}
-</head>
-<body>
-    <div id="app" data-page='{{ page_json|escapejs }}'></div>
 </body>
 </html>
