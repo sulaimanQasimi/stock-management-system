@@ -1,6 +1,7 @@
 import json
 
 from django.conf import settings
+from django.middleware.csrf import get_token
 from django.shortcuts import render
 
 
@@ -29,6 +30,7 @@ def _vite_assets():
 def render_inertia(request, component, props=None, status=200):
     """Render an Inertia page payload for the React frontend."""
     props = props or {}
+    props.setdefault('csrfToken', get_token(request))
     page = {
         'component': component,
         'props': props,
