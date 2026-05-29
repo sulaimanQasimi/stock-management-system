@@ -6,22 +6,16 @@ import './index.css';
 const pages = import.meta.glob('./Pages/**/*.{jsx,tsx}');
 
 function readInitialPage() {
-  const el = document.getElementById('app');
+  const pageElement = document.getElementById('inertia-page');
 
-  if (!el) {
-    throw new Error('Inertia root element #app was not found.');
+  if (!pageElement) {
+    throw new Error('Missing inertia-page script element.');
   }
 
-  const rawPage = el.getAttribute('data-page');
-
-  if (!rawPage) {
-    throw new Error('Missing Inertia data-page payload on #app.');
-  }
-
-  const page = JSON.parse(rawPage);
+  const page = JSON.parse(pageElement.textContent || '{}');
 
   if (!page || !page.component) {
-    throw new Error('Invalid Inertia page payload on #app.');
+    throw new Error('Invalid Inertia page payload.');
   }
 
   return page;
@@ -50,7 +44,6 @@ async function resolvePage(name) {
 createInertiaApp({
   id: 'app',
   page: readInitialPage(),
-  title: (title) => (title ? title + ' - Stock Management System' : 'Stock Management System'),
   resolve: resolvePage,
   setup({ el, App, props }) {
     createRoot(el).render(React.createElement(App, props));
