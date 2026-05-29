@@ -8,7 +8,7 @@
 
     {% if vite_assets.dev %}
     <script type="module" src="{{ vite_assets.dev_server_url }}/@vite/client"></script>
-    <script type="module" src="{{ vite_assets.dev_server_url }}/src/main.jsx"></script>
+    <script type="module" src="{{ vite_assets.dev_server_url }}/src/main.tsx"></script>
     {% else %}
         {% for css in vite_assets.css_content %}
     <style>{{ css|safe }}</style>
@@ -22,6 +22,6 @@
     {% endif %}
 </head>
 <body>
-    <div id="app" data-page="{{ page_json }}"></div>
+    <div id="app" data-page='{{ page_json|escapejs }}'></div>
 </body>
 </html>
