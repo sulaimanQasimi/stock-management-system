@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stock Management System</title>
+    {{ page_json|json_script:"inertia-page" }}
     <script>
-        window.initialPage = {{ page_json|safe }};
+        window.initialPage = JSON.parse(document.getElementById('inertia-page').textContent);
     </script>
 
     {% if vite_assets.dev %}
@@ -25,6 +26,6 @@
     {% endif %}
 </head>
 <body>
-    <div id="app" data-page="{{ page_json }}"></div>
+    <div id="app"></div>
 </body>
 </html>
