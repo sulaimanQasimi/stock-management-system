@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import inertia from '@inertiajs/vite';
 
 export default defineConfig({
-  plugins: [inertia(), react()],
+  plugins: [inertia(), react({ fastRefresh: false })],
   server: {
     port: 5173,
     proxy: {
