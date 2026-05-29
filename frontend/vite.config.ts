@@ -1,15 +1,16 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import inertia from '@inertiajs/vite';
 
 export default defineConfig({
-  plugins: [inertia()],
+  plugins: [
+    react(),
+    inertia(),
+  ],
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://127.0.0.1:8000'
-    }
-  },
-  esbuild: {
-    jsx: 'automatic',
+      '/api': 'http://127.0.0.1:8000',
+    },
   },
 });
