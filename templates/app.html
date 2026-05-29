@@ -8,12 +8,14 @@
     <script>
         window.initialPage = {{ page_json|safe }};
     </script>
+    {% if vite_assets.js %}
     <script type="module" crossorigin src="{% static vite_assets.js %}"></script>
+    {% endif %}
     {% for css_file in vite_assets.css %}
     <link rel="stylesheet" href="{% static css_file %}">
     {% endfor %}
 </head>
 <body>
-    <div id="app" data-page='{{ page_json|escapejs }}'></div>
+    <div id="app" data-page="{{ page_json }}"></div>
 </body>
 </html>
