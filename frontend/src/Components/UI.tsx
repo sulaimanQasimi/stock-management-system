@@ -47,13 +47,14 @@ export function Button({
   );
 }
 
+type CardProps = React.PropsWithChildren<{
+  className?: string;
+}>;
+
 export function Card({
   className = '',
   children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+}: CardProps) {
   return (
     <FlowbiteCard
       className={cn(
