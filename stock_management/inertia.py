@@ -7,9 +7,10 @@ from django.shortcuts import render
 
 
 def _vite_assets():
-    vite_dev_server_url = os.getenv('VITE_DEV_SERVER_URL', '').rstrip('/')
+    vite_dev_server_url = os.getenv('VITE_DEV_SERVER_URL', 'http://127.0.0.1:5173').rstrip('/')
+    use_vite_dev_server = os.getenv('USE_VITE_DEV_SERVER', 'true').lower() != 'false'
 
-    if settings.DEBUG and vite_dev_server_url:
+    if settings.DEBUG and use_vite_dev_server:
         return {
             'dev': True,
             'dev_server_url': vite_dev_server_url,
