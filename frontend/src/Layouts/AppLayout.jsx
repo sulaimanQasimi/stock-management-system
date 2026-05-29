@@ -17,13 +17,14 @@ const navigation = [
   { key: 'nav.reports', href: '/stock-profit-reports/', icon: '↗' },
 ];
 
-function NavLink({ item, active, onClick, t }) {
+function NavLink({ item, active, onClick, t, isRtl }) {
   return (
     <Link
       href={item.href}
       onClick={onClick}
       className={[
         'group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200',
+        isRtl ? 'flex-row-reverse text-right' : 'text-left',
         active
           ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
           : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
@@ -31,13 +32,13 @@ function NavLink({ item, active, onClick, t }) {
     >
       <span
         className={[
-          'flex h-9 w-9 items-center justify-center rounded-xl text-sm transition-colors',
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm transition-colors',
           active ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-white',
         ].join(' ')}
       >
         {item.icon}
       </span>
-      <span>{t(item.key)}</span>
+      <span className="min-w-0 flex-1">{t(item.key)}</span>
     </Link>
   );
 }
@@ -46,6 +47,7 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
   const { url, props } = usePage();
   const { t, language, direction, available, setLanguage } = useI18n();
   const [open, setOpen] = useState(false);
+  const isRtl = direction === 'rtl';
 
   const user = props?.auth?.user || props?.user;
 
@@ -65,11 +67,11 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
   const sidebar = (
     <>
       <div className="mb-8 border-b border-slate-100 pb-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-lg font-black text-white shadow-lg shadow-emerald-600/20">
+        <div className={['flex items-center gap-3', isRtl ? 'flex-row-reverse text-right' : ''].join(' ')}>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-lg font-black text-white shadow-lg shadow-emerald-600/20">
             S
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl font-bold tracking-tight text-slate-900">
               {t('app.name', 'StockUp')}
             </h1>
@@ -88,16 +90,17 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
             active={isActive(item.href)}
             onClick={() => setOpen(false)}
             t={t}
+            isRtl={isRtl}
           />
         ))}
       </nav>
 
-      <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/80 p-4 backdrop-blur">
+      <div className={['mt-8 rounded-3xl border border-slate-200 bg-slate-50/80 p-4 backdrop-blur', isRtl ? 'text-right' : ''].join(' ')}>
         <div className="mb-4">
           <p className="text-sm font-semibold text-slate-900">
             {user?.username || user?.name || 'StockUp User'}
           </p>
-          <p className="text-xs text-slate-500">Active session</p>
+          <p className="text-xs text-slate-500">{t('session.active', 'Active session')}</p>
         </div>
 
         <label
@@ -111,6 +114,7 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
           id="language-switcher"
           value={language}
           onChange={(event) => setLanguage(event.target.value)}
+          dir={direction}
           className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none ring-0 transition focus:border-emerald-500"
         >
           {available.map((item) => (
@@ -125,13 +129,21 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
 
   return (
     <div dir={direction} className="min-h-screen bg-slate-100 text-slate-900">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 overflow-y-auto border-r border-slate-200 bg-white px-5 py-6 lg:block">
+      <aside
+        className={[
+          'fixed inset-y-0 hidden w-72 overflow-y-auto border-slate-200 bg-white px-5 py-6 lg:block',
+          isRtl ? 'right-0 border-l' : 'left-0 border-r',
+        ].join(' ')}
+      >
         {sidebar}
       </aside>
 
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between px-4 py-4">
-          <Link href="/" className="flex items-center gap-3 font-bold text-slate-900">
+          <Link
+            href="/"
+            className={['flex items-center gap-3 font-bold text-slate-900', isRtl ? 'flex-row-reverse' : ''].join(' ')}
+          >
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md">
               S
             </span>
@@ -143,7 +155,7 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
             onClick={() => setOpen(true)}
             className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
           >
-            Menu
+            {t('menu.open', 'Menu')}
           </button>
         </div>
       </header>
@@ -157,24 +169,25 @@ export default function AppLayout({ title, subtitle, titleKey = null, subtitleKe
 
       <aside
         className={[
-          'fixed inset-y-0 left-0 z-50 w-80 max-w-[88vw] overflow-y-auto border-r border-slate-200 bg-white p-6 shadow-2xl transition-transform duration-300 lg:hidden',
-          open ? 'translate-x-0' : '-translate-x-full',
+          'fixed inset-y-0 z-50 w-80 max-w-[88vw] overflow-y-auto border-slate-200 bg-white p-6 shadow-2xl transition-transform duration-300 lg:hidden',
+          isRtl ? 'right-0 border-l' : 'left-0 border-r',
+          open ? 'translate-x-0' : isRtl ? 'translate-x-full' : '-translate-x-full',
         ].join(' ')}
       >
-        <div className="mb-4 flex justify-end">
+        <div className={['mb-4 flex', isRtl ? 'justify-start' : 'justify-end'].join(' ')}>
           <button
             type="button"
             onClick={() => setOpen(false)}
             className="rounded-xl px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
-            Close
+            {t('menu.close', 'Close')}
           </button>
         </div>
 
         {sidebar}
       </aside>
 
-      <main className="lg:pl-72">
+      <main className={isRtl ? 'lg:pr-72' : 'lg:pl-72'}>
         <div className="border-b border-slate-200 bg-gradient-to-br from-white to-slate-50 px-4 py-6 sm:px-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
