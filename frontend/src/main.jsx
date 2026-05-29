@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import './index.css';
 
 createInertiaApp({
+  initialPage: window.initialPage,
   resolve: (name) => {
     const pages = import.meta.glob('./Pages/**/*.{jsx,tsx}', { eager: true });
     return pages[`./Pages/${name}.jsx`] || pages[`./Pages/${name}.tsx`];
