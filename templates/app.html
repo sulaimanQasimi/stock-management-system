@@ -8,12 +8,21 @@
     <script>
         window.initialPage = {{ page_json|safe }};
     </script>
-    {% if vite_assets.js %}
-    <script type="module" crossorigin src="{% static vite_assets.js %}"></script>
+
+    {% if vite_assets.dev %}
+    <script type="module" src="{{ vite_assets.dev_server_url }}/@vite/client"></script>
+    <script type="module" src="{{ vite_assets.dev_server_url }}/src/main.jsx"></script>
+    {% else %}
+        {% for css in vite_assets.css_content %}
+    <style>{{ css|safe }}</style>
+        {% endfor %}
+
+        {% if vite_assets.js_content %}
+    <script type="module">{{ vite_assets.js_content|safe }}</script>
+        {% elif vite_assets.js %}
+    <script type="module" src="{% static vite_assets.js %}"></script>
+        {% endif %}
     {% endif %}
-    {% for css_file in vite_assets.css %}
-    <link rel="stylesheet" href="{% static css_file %}">
-    {% endfor %}
 </head>
 <body>
     <div id="app" data-page="{{ page_json }}"></div>
