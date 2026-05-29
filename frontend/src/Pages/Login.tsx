@@ -13,6 +13,12 @@ export default function Login({ databases = [], error = null }) {
 
     router.post('/login/', form, {
       preserveScroll: true,
+       headers: {
+    'X-CSRFToken': document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('csrftoken='))
+      ?.split('=')[1] || '',
+  },
     });
   }
 
