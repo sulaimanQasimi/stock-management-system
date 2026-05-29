@@ -1,11 +1,21 @@
-import '@vitejs/plugin-react/preamble';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import './index.css';
 
+const appElement = document.getElementById('app');
+let initialPage = window.initialPage;
+
+if (!initialPage && appElement && appElement.dataset && appElement.dataset.page) {
+  initialPage = JSON.parse(appElement.dataset.page);
+}
+
+if (!appElement || !initialPage || !initialPage.component) {
+  console.error('Missing Inertia initial page payload.', { appElement, initialPage });
+}
+
 createInertiaApp({
-  initialPage: window.initialPage,
+  initialPage,
   resolve: (name) => {
     const pages = import.meta.glob('./Pages/**/*.{jsx,tsx}', { eager: true });
     const page = pages[`./Pages/${name}.jsx`] || pages[`./Pages/${name}.tsx`];
