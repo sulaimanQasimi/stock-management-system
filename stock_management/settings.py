@@ -67,13 +67,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collectstatic'
-STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
+STATICFILES_DIRS = [BASE_DIR / 'resources' / 'dist']
 
 INERTIA_LAYOUT = 'app.html'
 
 DJANGO_VITE = {
     'default': {
         'dev_mode': DEBUG,
+        'dev_server_protocol': 'http',
+        'dev_server_host': 'localhost',
+        'dev_server_port': 5173,
+        'static_url_prefix': '',
+        'manifest_path': BASE_DIR / 'resources' / 'dist' / '.vite' / 'manifest.json',
     }
 }
 
