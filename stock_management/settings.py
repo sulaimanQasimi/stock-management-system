@@ -17,6 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'inertia',
+    'django_vite',
     'authorization',
     'stock_app',
     'finance',
@@ -32,6 +34,7 @@ MIDDLEWARE = [
     'stock_management.middleware.TenantSessionProtectionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'inertia.middleware.InertiaMiddleware',
 ]
 
 ROOT_URLCONF = 'stock_management.urls'

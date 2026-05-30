@@ -1,30 +1,14 @@
 {% load static %}
+{% load django_vite %}
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stock Management System</title>
-
-    {% if not vite_assets.dev %}
-        {% for css in vite_assets.css_content %}
-    <style>{{ css|safe }}</style>
-        {% endfor %}
-    {% endif %}
+{% vite_hmr_client %}
 </head>
 <body>
-    {{ page|json_script:"inertia-page" }}
-    <div id="app"></div>
-
-    {% if vite_assets.dev %}
-    <script type="module" src="{{ vite_assets.dev_server_url }}/@vite/client"></script>
-    <script type="module" src="{{ vite_assets.dev_server_url }}/src/main.tsx"></script>
-    {% else %}
-        {% if vite_assets.js_content %}
-    <script type="module">{{ vite_assets.js_content|safe }}</script>
-        {% elif vite_assets.js %}
-    <script type="module" src="{% static vite_assets.js %}"></script>
-        {% endif %}
-    {% endif %}
+  {% block inertia %}{% endblock %}
 </body>
 </html>
