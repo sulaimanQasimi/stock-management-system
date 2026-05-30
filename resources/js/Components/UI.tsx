@@ -37,11 +37,16 @@ export function Button({
     <FlowbiteButton
       type="button"
       color={buttonColors[variant]}
-      isProcessing={loading}
       disabled={loading || props.disabled}
       className={cn('font-semibold transition-transform hover:scale-[0.99]', className)}
       {...props}
     >
+      {loading ? (
+        <span
+          aria-hidden="true"
+          className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent align-[-2px]"
+        />
+      ) : null}
       {children}
     </FlowbiteButton>
   );
