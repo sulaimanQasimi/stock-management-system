@@ -124,6 +124,13 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+
+INERTIA_LAYOUT = 'app.html'
+
+DJANGO_VITE_MODE=DEBUG
+
+STATIC_ROOT = BASE_DIR / 'collectstatic'
+
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'dist']
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'

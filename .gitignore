@@ -7,7 +7,7 @@ __pycache__/
 *.sqlite3
 db.sqlite3
 node_modules/
-frontend/node_modules/
+resources/node_modules/
 .vscode/
 .idea/
 .DS_Store
