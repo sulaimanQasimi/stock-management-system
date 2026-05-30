@@ -8,6 +8,7 @@ __pycache__/
 db.sqlite3
 node_modules/
 resources/node_modules/
+resources/dist/
 .vscode/
 .idea/
 .DS_Store
