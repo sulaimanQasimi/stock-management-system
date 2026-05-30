@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "js/tailwind-version-shim.js", "js/main.t, "js/i18n.ts"sx", "js/main.jsx", "js/bootstrap.js", "js/Pages", "js/Layouts", "js/Components"]
+  "include": ["js", "js/tailwind-version-shim.js", "js/main.ts", "js/i18n.ts", "js/main.jsx", "js/bootstrap.js", "js/Pages", "js/Layouts", "js/Components"]
 }
