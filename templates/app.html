@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Management System</title>
 
-    {% if debug %}{% vite_hmr_client %}{% endif %}
+    {% if debug %}
+    {% vite_react_refresh %}
+    {% vite_hmr_client %}
+    {% endif %}
     {% vite_asset 'js/main.tsx' %}
 </head>
 <body>

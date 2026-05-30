@@ -8,13 +8,15 @@ const pages = import.meta.glob<{ default: React.ComponentType }>(
 );
 
 function readInitialPage() {
+  const appElement = document.getElementById('app');
   const pageElement = document.getElementById('inertia-page');
+  const pageJson = appElement?.dataset.page || pageElement?.textContent;
 
-  if (!pageElement) {
-    throw new Error('Missing inertia-page script element.');
+  if (!pageJson) {
+    throw new Error('Missing Inertia page payload.');
   }
 
-  const page = JSON.parse(pageElement.textContent || '{}');
+  const page = JSON.parse(pageJson);
 
   if (!page || !page.component) {
     throw new Error('Invalid Inertia page payload.');
