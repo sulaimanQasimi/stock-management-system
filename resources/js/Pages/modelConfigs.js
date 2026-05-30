@@ -1,18 +1,21 @@
 export const modelConfigs = {
   Category: {
     title: 'Categories',
+    propKey: 'categories',
     subtitle: 'Manage product categories.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'description', label: 'Description' }],
     fields: [{ name: 'name', label: 'Name', required: true }, { name: 'description', label: 'Description', type: 'textarea' }],
   },
   Unit: {
     title: 'Units',
+    propKey: 'units',
     subtitle: 'Manage pieces, packs, cartons, kilograms, and other measurement units.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'abbreviation', label: 'Abbreviation' }],
     fields: [{ name: 'name', label: 'Name', required: true }, { name: 'abbreviation', label: 'Abbreviation' }],
   },
   Party: {
     title: 'Parties',
+    propKey: 'parties',
     subtitle: 'Manage suppliers, customers, or both.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'party_type', label: 'Type' }, { key: 'phone', label: 'Phone' }],
     fields: [
@@ -27,6 +30,7 @@ export const modelConfigs = {
   },
   Product: {
     title: 'Products',
+    propKey: 'products',
     subtitle: 'Manage products, stock, and sale pricing.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'quantity', label: 'Qty' }, { key: 'pack_sale_price', label: 'Pack Sale' }, { key: 'unit_sale_price', label: 'Unit Sale' }],
     fields: [
@@ -42,6 +46,7 @@ export const modelConfigs = {
   },
   PurchaseBatch: {
     title: 'Purchase Batches',
+    propKey: 'purchaseBatches',
     subtitle: 'Manage purchase headers and batch totals.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'batch_number', label: 'Batch No' }, { key: 'date', label: 'Date' }, { key: 'party', label: 'Party' }, { key: 'total', label: 'Total' }],
     fields: [
@@ -56,6 +61,7 @@ export const modelConfigs = {
   },
   PurchaseItem: {
     title: 'Purchase Items',
+    propKey: 'purchaseItems',
     subtitle: 'Manage purchase lines, pack conversion, and base units.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'purchase', label: 'Purchase' }, { key: 'product', label: 'Product' }, { key: 'quantity', label: 'Qty' }, { key: 'total', label: 'Total' }],
     fields: [
@@ -72,6 +78,7 @@ export const modelConfigs = {
   },
   PurchasePayment: {
     title: 'Purchase Payments',
+    propKey: 'purchasePayments',
     subtitle: 'Manage purchase payments linked with finance transactions.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'purchase', label: 'Purchase' }, { key: 'account', label: 'Account' }, { key: 'currency', label: 'Currency' }],
     fields: [
@@ -83,6 +90,7 @@ export const modelConfigs = {
   },
   Sale: {
     title: 'Sales',
+    propKey: 'sales',
     subtitle: 'Manage sale headers, discounts, and totals.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'sale_number', label: 'Sale No' }, { key: 'date', label: 'Date' }, { key: 'party', label: 'Party' }, { key: 'net_total', label: 'Net Total' }],
     fields: [
@@ -98,6 +106,7 @@ export const modelConfigs = {
   },
   SaleItem: {
     title: 'Sale Items',
+    propKey: 'saleItems',
     subtitle: 'Sell by pack or piece from purchase batches.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'sale', label: 'Sale' }, { key: 'product', label: 'Product' }, { key: 'quantity', label: 'Qty' }, { key: 'gross_profit', label: 'Profit' }],
     fields: [
@@ -110,6 +119,7 @@ export const modelConfigs = {
   },
   SalePayment: {
     title: 'Sale Payments',
+    propKey: 'salePayments',
     subtitle: 'Manage sale payments linked with accounts and transactions.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'sale', label: 'Sale' }, { key: 'account', label: 'Account' }, { key: 'amount', label: 'Amount' }],
     fields: [
@@ -122,6 +132,7 @@ export const modelConfigs = {
   },
   StockProfitReport: {
     title: 'Stock Profit Reports',
+    propKey: 'stockProfitReports',
     subtitle: 'Generate general, batch, or product profit reports.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'report_scope', label: 'Scope' }, { key: 'total_sales', label: 'Sales' }, { key: 'gross_profit', label: 'Profit' }],
     fields: [
@@ -136,30 +147,35 @@ export const modelConfigs = {
   },
   Currency: {
     title: 'Currencies',
+    propKey: 'currencies',
     subtitle: 'Manage currencies used in stock and finance.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'code', label: 'Code' }, { key: 'name', label: 'Name' }, { key: 'symbol', label: 'Symbol' }],
     fields: [{ name: 'code', label: 'Code', required: true }, { name: 'name', label: 'Name', required: true }, { name: 'symbol', label: 'Symbol' }],
   },
   Account: {
     title: 'Accounts',
+    propKey: 'accounts',
     subtitle: 'Manage cash, bank, and wallet accounts.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'code', label: 'Code' }, { key: 'name', label: 'Name' }, { key: 'balance', label: 'Balance' }],
     fields: [{ name: 'code', label: 'Code', required: true }, { name: 'name', label: 'Name', required: true }, { name: 'currency', label: 'Currency', type: 'select', optionsKey: 'currencies' }, { name: 'balance', label: 'Balance', type: 'number' }],
   },
   Transaction: {
     title: 'Transactions',
+    propKey: 'transactions',
     subtitle: 'Manage financial deposits and withdrawals.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'account', label: 'Account' }, { key: 'transaction_type', label: 'Type' }, { key: 'amount', label: 'Amount' }],
     fields: [{ name: 'account', label: 'Account', type: 'select', optionsKey: 'accounts' }, { name: 'transaction_type', label: 'Type', type: 'select', options: [{ value: 'deposit', label: 'Deposit' }, { value: 'withdraw', label: 'Withdraw' }] }, { name: 'amount', label: 'Amount', type: 'number' }, { name: 'description', label: 'Description', type: 'textarea' }],
   },
   ExpenseType: {
     title: 'Expense Types',
+    propKey: 'expenseTypes',
     subtitle: 'Manage expense categories.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'description', label: 'Description' }],
     fields: [{ name: 'name', label: 'Name', required: true }, { name: 'description', label: 'Description', type: 'textarea' }],
   },
   Expense: {
     title: 'Expenses',
+    propKey: 'expenses',
     subtitle: 'Manage expenses linked to finance transactions.',
     columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'expense_type', label: 'Type' }, { key: 'amount', label: 'Amount' }],
     fields: [{ name: 'name', label: 'Name', required: true }, { name: 'expense_type', label: 'Expense Type', type: 'select', optionsKey: 'expenseTypes' }, { name: 'amount', label: 'Amount', type: 'number' }, { name: 'transaction', label: 'Transaction', type: 'select', optionsKey: 'transactions' }, { name: 'description', label: 'Description', type: 'textarea' }],

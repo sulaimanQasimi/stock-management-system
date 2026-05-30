@@ -1,7 +1,13 @@
 import React from 'react';
 import { createInertiaApp } from '@inertiajs/react';
+import { http } from '@inertiajs/core';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+
+http.setClient({
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
+});
 
 const pages = import.meta.glob<{ default: React.ComponentType }>(
   './Pages/**/*.{jsx,tsx}',

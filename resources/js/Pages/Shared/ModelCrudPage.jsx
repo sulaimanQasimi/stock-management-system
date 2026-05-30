@@ -13,6 +13,32 @@ const fieldComponents = {
 };
 
 const getDefaultValue = (field) => (field.type === 'number' ? 0 : '');
+
+const normalizeOptions = (items = []) => items.map((item) => {
+  if (item && typeof item === 'object') {
+    return {
+      value: item.value ?? item.id ?? '',
+      label: item.label ?? item.name ?? item.code ?? item.title ?? String(item.value ?? item.id ?? ''),
+    };
+  }
+
+  return { value: item, label: String(item) };
+}).filter((item) => item.value !== '');
+
+const pluralize = (value) => {
+  if (!value) return '';
+  if (value.endsWith('y')) return `${value.slice(0, -1)}ies`;
+  if (value.endsWith('s')) return value;
+  return `${value}s`;
+};
+
+const defaultPropKey = (title) => {
+  const words = title.replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+/).filter(Boolean);
+  if (!words.length) return 'records';
+
+  const [first, ...rest] = words;
+  return `${first.charAt(0).toLowerCase()}${first.slice(1)}${rest.join('')}`;
+};
 const titleKeys = {
   Categories: 'categories.title',
   Units: 'units.title',
@@ -32,10 +58,26 @@ const titleKeys = {
   Expenses: 'finance.expenses',
 };
 
-function renderField(field, data, setData, errors, options) {
+function optionListFor(field, options, props) {
+  if (field.type !== 'select') return [];
+  const key = field.optionsKey || field.name;
+  const candidates = [
+    options[key],
+    props[key],
+    props[pluralize(key)],
+    field.options,
+  ];
+
+  return normalizeOptions(candidates.find((items) => Array.isArray(items)) || []);
+}
+
+function renderField(field, data, setData, errors, options, props) {
   const Component = fieldComponents[field.type] || TextInput;
   const extraProps = field.type === 'select'
-    ? { options: options[field.optionsKey] || field.options || [] }
+    ? {
+      options: optionListFor(field, options, props),
+      placeholder: `Select ${field.label}`,
+    }
     : {};
 
   return (
@@ -51,8 +93,11 @@ function renderField(field, data, setData, errors, options) {
   );
 }
 
-export default function ModelCrudPage({ title, subtitle, records = [], fields = [], columns = [], options = {}, routes = {}, initial = {} }) {
+export default function ModelCrudPage(props) {
+  const { title, subtitle, fields = [], columns = [], options = {}, routes = {}, initial = {}, propKey } = props;
   const { t } = useI18n();
+  const recordKey = propKey || defaultPropKey(title);
+  const records = props.records || props[recordKey] || [];
   const defaultData = fields.reduce((values, field) => {
     values[field.name] = initial[field.name] ?? getDefaultValue(field);
     return values;
@@ -65,6 +110,7 @@ export default function ModelCrudPage({ title, subtitle, records = [], fields = 
     event.preventDefault();
     if (!routes.store) return;
     post(routes.store, {
+      forceFormData: true,
       preserveScroll: true,
       onSuccess: () => reset(),
     });
@@ -111,7 +157,7 @@ export default function ModelCrudPage({ title, subtitle, records = [], fields = 
           </div>
           <div className="space-y-4">
             {fields.map((field) => (
-              <div key={field.name}>{renderField(field, data, setData, errors, options)}</div>
+              <div key={field.name}>{renderField(field, data, setData, errors, options, props)}</div>
             ))}
           </div>
           <div className="mt-6 flex justify-end">

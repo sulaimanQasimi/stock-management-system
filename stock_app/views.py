@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
@@ -104,8 +104,14 @@ def logout_view(request):
     return redirect('/login/')
 
 
-def _render_index(request, page, prop, queryset, fields, options=()):
-    return render_inertia(request, page, {prop: _rows(queryset, *fields), 'options': _common_options(request.user, options), 'auth': _auth(request)})
+def _render_index(request, page, prop, queryset, fields, options=(), errors=None):
+    return render_inertia(request, page, {
+        prop: _rows(queryset, *fields),
+        'options': _common_options(request.user, options),
+        'routes': {'store': request.path},
+        'errors': errors or {},
+        'auth': _auth(request),
+    }, status=422 if errors else 200)
 
 
 def _permission_options():
@@ -323,10 +329,56 @@ def _stock_movement_rows(queryset):
     return [{'id': item.id, 'product': item.product.name, 'movement_type': item.movement_type, 'quantity': str(item.quantity), 'from_department': item.from_department.name if item.from_department else '', 'to_department': item.to_department.name if item.to_department else '', 'reference_number': item.reference_number, 'reason': item.reason, 'movement_date': item.movement_date.isoformat() if item.movement_date else ''} for item in queryset]
 
 
+def _field_errors(error):
+    if hasattr(error, 'message_dict'):
+        return error.message_dict
+    return {'form': getattr(error, 'messages', [str(error)])}
+
+
+def _create_record(model, post_data, user):
+    instance = model()
+
+    for field in model._meta.fields:
+        if field.primary_key or not field.editable or field.auto_created:
+            continue
+        if field.name in {
+            'created_by', 'created_at', 'updated_by', 'updated_at',
+            'is_trashed', 'trashed_by', 'trashed_at', 'restored_by', 'restored_at',
+            'deleted_by', 'deleted_at', 'force_deleted_by', 'force_deleted_at',
+        }:
+            continue
+
+        value = post_data.get(field.name)
+        if value in (None, ''):
+            continue
+
+        if field.many_to_one:
+            setattr(instance, field.attname, value)
+        else:
+            setattr(instance, field.name, value)
+
+    if hasattr(instance, 'set_created_user'):
+        instance.set_created_user(user)
+    if hasattr(instance, 'set_updated_user'):
+        instance.set_updated_user(user)
+
+    instance.full_clean()
+    instance.save()
+
+
 def _secured_index(view_name, prop, model, fields, order_by, options=(), app_label='stock_app'):
     @login_required
     def view(request):
         _require(request.user, 'view', model, app_label)
+        if request.method == 'POST':
+            _require(request.user, 'create', model, app_label)
+            try:
+                _create_record(model, request.POST, request.user)
+                return redirect(request.path)
+            except ValidationError as error:
+                queryset = model.objects.for_user(request.user).order_by(*order_by)[:500]
+                return _render_index(request, view_name, prop, queryset, fields, options, _field_errors(error))
+
         queryset = model.objects.for_user(request.user).order_by(*order_by)[:500]
         return _render_index(request, view_name, prop, queryset, fields, options)
     return view
