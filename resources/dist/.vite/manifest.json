@@ -1,27 +1,27 @@
 {
-  "_AppLayout-DKzAzzt0.js": {
-    "file": "assets/AppLayout-DKzAzzt0.js",
+  "_AppLayout-Cavi7SDg.js": {
+    "file": "assets/AppLayout-Cavi7SDg.js",
     "name": "AppLayout",
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx"
     ]
   },
-  "_Textarea-ChAHJPsK.js": {
-    "file": "assets/Textarea-ChAHJPsK.js",
+  "_Textarea-BmPnSSrG.js": {
+    "file": "assets/Textarea-BmPnSSrG.js",
     "name": "Textarea",
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx"
     ]
   },
-  "_UI-98NGxPoF.js": {
-    "file": "assets/UI-98NGxPoF.js",
+  "_UI-wCEPS09l.js": {
+    "file": "assets/UI-wCEPS09l.js",
     "name": "UI",
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_Textarea-ChAHJPsK.js"
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "_jsx-runtime-u17CrQMm.js": {
@@ -33,7 +33,7 @@
     "name": "modelConfigs"
   },
   "js/Pages/Account.jsx": {
-    "file": "assets/Account-RMpWb4vU.js",
+    "file": "assets/Account-DW_BzTIs.js",
     "name": "Account",
     "src": "js/Pages/Account.jsx",
     "isDynamicEntry": true,
@@ -42,12 +42,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Category.jsx": {
-    "file": "assets/Category-CAxyVWC_.js",
+    "file": "assets/Category-DqTQOE2n.js",
     "name": "Category",
     "src": "js/Pages/Category.jsx",
     "isDynamicEntry": true,
@@ -56,12 +56,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Currency.jsx": {
-    "file": "assets/Currency-eTBpw2vi.js",
+    "file": "assets/Currency-D_ORPs_4.js",
     "name": "Currency",
     "src": "js/Pages/Currency.jsx",
     "isDynamicEntry": true,
@@ -70,38 +70,38 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Dashboard.jsx": {
-    "file": "assets/Dashboard-wD_zWFU5.js",
+    "file": "assets/Dashboard-DJODTdg_.js",
     "name": "Dashboard",
     "src": "js/Pages/Dashboard.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Departments.tsx": {
-    "file": "assets/Departments-CtJTPYVF.js",
+    "file": "assets/Departments-B9M0QZKV.js",
     "name": "Departments",
     "src": "js/Pages/Departments.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Expense.jsx": {
-    "file": "assets/Expense-CbBAPzge.js",
+    "file": "assets/Expense-CQ-c-_MC.js",
     "name": "Expense",
     "src": "js/Pages/Expense.jsx",
     "isDynamicEntry": true,
@@ -110,12 +110,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/ExpenseType.jsx": {
-    "file": "assets/ExpenseType-DwBdt_4U.js",
+    "file": "assets/ExpenseType-Bu4KcHVh.js",
     "name": "ExpenseType",
     "src": "js/Pages/ExpenseType.jsx",
     "isDynamicEntry": true,
@@ -124,12 +124,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Login.tsx": {
-    "file": "assets/Login-BBbQgclS.js",
+    "file": "assets/Login-DXFuplPE.js",
     "name": "Login",
     "src": "js/Pages/Login.tsx",
     "isDynamicEntry": true,
@@ -139,20 +139,20 @@
     ]
   },
   "js/Pages/Operations.tsx": {
-    "file": "assets/Operations-PE2BQLY6.js",
+    "file": "assets/Operations-Bapc31b3.js",
     "name": "Operations",
     "src": "js/Pages/Operations.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
       "js/main.tsx",
-      "_Textarea-ChAHJPsK.js"
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Party.jsx": {
-    "file": "assets/Party-BV1UnrTJ.js",
+    "file": "assets/Party-Ch6eTpW_.js",
     "name": "Party",
     "src": "js/Pages/Party.jsx",
     "isDynamicEntry": true,
@@ -161,25 +161,25 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/PermissionDenied.tsx": {
-    "file": "assets/PermissionDenied-CQQdK4aZ.js",
+    "file": "assets/PermissionDenied-ilj4jxpb.js",
     "name": "PermissionDenied",
     "src": "js/Pages/PermissionDenied.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Product.jsx": {
-    "file": "assets/Product-CqZdUDi9.js",
+    "file": "assets/Product-CASLjxYi.js",
     "name": "Product",
     "src": "js/Pages/Product.jsx",
     "isDynamicEntry": true,
@@ -188,25 +188,25 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/ProductSearch.tsx": {
-    "file": "assets/ProductSearch-COLcsEzG.js",
+    "file": "assets/ProductSearch-BDA8jhnR.js",
     "name": "ProductSearch",
     "src": "js/Pages/ProductSearch.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Products.jsx": {
-    "file": "assets/Products-v4S_TWic.js",
+    "file": "assets/Products-DUlYzuY8.js",
     "name": "Products",
     "src": "js/Pages/Products.jsx",
     "isDynamicEntry": true,
@@ -214,23 +214,23 @@
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Profile.tsx": {
-    "file": "assets/Profile-D825suaB.js",
+    "file": "assets/Profile-j34MLRxy.js",
     "name": "Profile",
     "src": "js/Pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js"
+      "_AppLayout-Cavi7SDg.js"
     ]
   },
   "js/Pages/PurchaseBatch.jsx": {
-    "file": "assets/PurchaseBatch-BlpS9pbV.js",
+    "file": "assets/PurchaseBatch-BZ5RQmYB.js",
     "name": "PurchaseBatch",
     "src": "js/Pages/PurchaseBatch.jsx",
     "isDynamicEntry": true,
@@ -239,12 +239,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/PurchaseItem.jsx": {
-    "file": "assets/PurchaseItem-9QmB0un2.js",
+    "file": "assets/PurchaseItem-DO6V2sdy.js",
     "name": "PurchaseItem",
     "src": "js/Pages/PurchaseItem.jsx",
     "isDynamicEntry": true,
@@ -253,12 +253,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/PurchasePayment.jsx": {
-    "file": "assets/PurchasePayment-7jTHisfL.js",
+    "file": "assets/PurchasePayment-D8ZOgwMM.js",
     "name": "PurchasePayment",
     "src": "js/Pages/PurchasePayment.jsx",
     "isDynamicEntry": true,
@@ -267,12 +267,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Sale.jsx": {
-    "file": "assets/Sale-CSrrrKv6.js",
+    "file": "assets/Sale-D6BA74er.js",
     "name": "Sale",
     "src": "js/Pages/Sale.jsx",
     "isDynamicEntry": true,
@@ -281,12 +281,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/SaleItem.jsx": {
-    "file": "assets/SaleItem-COnM55SK.js",
+    "file": "assets/SaleItem-DiYp6_uI.js",
     "name": "SaleItem",
     "src": "js/Pages/SaleItem.jsx",
     "isDynamicEntry": true,
@@ -295,12 +295,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/SalePayment.jsx": {
-    "file": "assets/SalePayment-Dwf-VHCf.js",
+    "file": "assets/SalePayment-BGEVX5bN.js",
     "name": "SalePayment",
     "src": "js/Pages/SalePayment.jsx",
     "isDynamicEntry": true,
@@ -309,63 +309,63 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/SaleServiceItems.tsx": {
-    "file": "assets/SaleServiceItems-BG6yzRh3.js",
+    "file": "assets/SaleServiceItems-DK4r1cEH.js",
     "name": "SaleServiceItems",
     "src": "js/Pages/SaleServiceItems.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Services.tsx": {
-    "file": "assets/Services-XAsdWS5C.js",
+    "file": "assets/Services-B-AtVf8r.js",
     "name": "Services",
     "src": "js/Pages/Services.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Shared/ModelCrudPage.jsx": {
-    "file": "assets/ModelCrudPage-C766iIsx.js",
+    "file": "assets/ModelCrudPage-CeKT5nEd.js",
     "name": "ModelCrudPage",
     "src": "js/Pages/Shared/ModelCrudPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/StockMovements.tsx": {
-    "file": "assets/StockMovements-D9RHL94T.js",
+    "file": "assets/StockMovements-CG3DpS59.js",
     "name": "StockMovements",
     "src": "js/Pages/StockMovements.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/StockProfitReport.jsx": {
-    "file": "assets/StockProfitReport-B36qO_1a.js",
+    "file": "assets/StockProfitReport-C4nwBn8T.js",
     "name": "StockProfitReport",
     "src": "js/Pages/StockProfitReport.jsx",
     "isDynamicEntry": true,
@@ -374,12 +374,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Transaction.jsx": {
-    "file": "assets/Transaction-gDyGUWjr.js",
+    "file": "assets/Transaction-dZap3deI.js",
     "name": "Transaction",
     "src": "js/Pages/Transaction.jsx",
     "isDynamicEntry": true,
@@ -388,12 +388,12 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Unit.jsx": {
-    "file": "assets/Unit-eJQz2Icf.js",
+    "file": "assets/Unit-B4cw-nlu.js",
     "name": "Unit",
     "src": "js/Pages/Unit.jsx",
     "isDynamicEntry": true,
@@ -402,25 +402,25 @@
       "js/main.tsx",
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/Users.tsx": {
-    "file": "assets/Users-DCQt5Dpv.js",
+    "file": "assets/Users-DusfEypH.js",
     "name": "Users",
     "src": "js/Pages/Users.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-u17CrQMm.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_UI-98NGxPoF.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_UI-wCEPS09l.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/Pages/createModelPage.tsx": {
-    "file": "assets/createModelPage-hU8WkCXX.js",
+    "file": "assets/createModelPage-CScFBfrZ.js",
     "name": "createModelPage",
     "src": "js/Pages/createModelPage.tsx",
     "isDynamicEntry": true,
@@ -429,12 +429,12 @@
       "js/Pages/Shared/ModelCrudPage.jsx",
       "_modelConfigs-D9iebz8t.js",
       "js/main.tsx",
-      "_AppLayout-DKzAzzt0.js",
-      "_Textarea-ChAHJPsK.js"
+      "_AppLayout-Cavi7SDg.js",
+      "_Textarea-BmPnSSrG.js"
     ]
   },
   "js/main.tsx": {
-    "file": "assets/main-B978I8y9.js",
+    "file": "assets/main-Cx7yaXRA.js",
     "name": "main",
     "src": "js/main.tsx",
     "isEntry": true,

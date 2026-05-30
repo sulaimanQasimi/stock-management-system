@@ -1,1 +1,0 @@
-import{j as r}from"./jsx-runtime-u17CrQMm.js";import"./main-B978I8y9.js";import e from"./ModelCrudPage-C766iIsx.js";import{m}from"./modelConfigs-D9iebz8t.js";import"./AppLayout-DKzAzzt0.js";import"./Textarea-ChAHJPsK.js";function x(o){return r.jsx(e,{...m.ExpenseType,...o})}export{x as default};

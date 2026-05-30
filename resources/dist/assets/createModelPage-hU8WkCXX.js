@@ -1,1 +1,0 @@
-import{j as i}from"./jsx-runtime-u17CrQMm.js";import m from"./ModelCrudPage-C766iIsx.js";import{m as n}from"./modelConfigs-D9iebz8t.js";import"./main-B978I8y9.js";import"./AppLayout-DKzAzzt0.js";import"./Textarea-ChAHJPsK.js";function g(r,t){return function(o){const e=o[t]||[];return i.jsx(m,{...n[r],records:e,options:o.options||{}})}}export{g as createModelPage};
