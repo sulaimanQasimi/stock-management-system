@@ -1,0 +1,1 @@
+import{j as r}from"./jsx-runtime-u17CrQMm.js";import"./main-B978I8y9.js";import t from"./ModelCrudPage-C766iIsx.js";import{m}from"./modelConfigs-D9iebz8t.js";import"./AppLayout-DKzAzzt0.js";import"./Textarea-ChAHJPsK.js";function n(o){return r.jsx(t,{...m.StockProfitReport,...o})}export{n as default};

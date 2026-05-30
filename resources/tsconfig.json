@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
   },
-  "include": ["js", "js/tailwind-version-shim.js", "js/main.ts", "js/i18n.ts", "js/main.jsx", "js/bootstrap.js", "js/Pages", "js/Layouts", "js/Components"]
+  "include": ["js", "js/tailwind-version-shim.js", "js/main.tsx", "js/i18n.ts", "js/main.jsx", "js/bootstrap.js", "js/Pages", "js/Layouts", "js/Components"]
 }

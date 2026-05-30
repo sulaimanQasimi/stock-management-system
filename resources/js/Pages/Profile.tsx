@@ -2,7 +2,34 @@ import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import AppLayout from '../Layouts/AppLayout';
 
-export default function Profile({ profile, status, errors = {} }) {
+type ProfileData = {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+};
+
+type FormErrors = Record<string, string[] | string | undefined>;
+
+type FieldProps = {
+  label: string;
+  error?: string | string[];
+  children: React.ReactNode;
+};
+
+function firstError(error?: string | string[]) {
+  return Array.isArray(error) ? error[0] : error;
+}
+
+export default function Profile({
+  profile,
+  status,
+  errors = {},
+}: {
+  profile?: ProfileData;
+  status?: string;
+  errors?: FormErrors;
+}) {
   const [details, setDetails] = useState({
     username: profile?.username || '',
     email: profile?.email || '',
@@ -41,7 +68,7 @@ export default function Profile({ profile, status, errors = {} }) {
           ) : null}
 
           <div className="mt-6 grid gap-4">
-            <Field label="Username" error={errors.username?.[0]}>
+            <Field label="Username" error={errors.username}>
               <input
                 value={details.username}
                 onChange={(e) => setDetails((v) => ({ ...v, username: e.target.value }))}
@@ -49,7 +76,7 @@ export default function Profile({ profile, status, errors = {} }) {
               />
             </Field>
 
-            <Field label="Email" error={errors.email?.[0]}>
+            <Field label="Email" error={errors.email}>
               <input
                 value={details.email}
                 onChange={(e) => setDetails((v) => ({ ...v, email: e.target.value }))}
@@ -92,7 +119,7 @@ export default function Profile({ profile, status, errors = {} }) {
           <h3 className="text-xl font-bold text-slate-900">Security</h3>
 
           <div className="mt-6 grid gap-4">
-            <Field label="Current Password" error={errors.current_password?.[0]}>
+            <Field label="Current Password" error={errors.current_password}>
               <input
                 type="password"
                 value={passwords.current_password}
@@ -101,7 +128,7 @@ export default function Profile({ profile, status, errors = {} }) {
               />
             </Field>
 
-            <Field label="New Password" error={errors.password?.[0]}>
+            <Field label="New Password" error={errors.password}>
               <input
                 type="password"
                 value={passwords.password}
@@ -110,7 +137,7 @@ export default function Profile({ profile, status, errors = {} }) {
               />
             </Field>
 
-            <Field label="Confirm Password" error={errors.password_confirmation?.[0]}>
+            <Field label="Confirm Password" error={errors.password_confirmation}>
               <input
                 type="password"
                 value={passwords.password_confirmation}
@@ -129,12 +156,14 @@ export default function Profile({ profile, status, errors = {} }) {
   );
 }
 
-function Field({ label, error, children }) {
+function Field({ label, error, children }: FieldProps) {
+  const message = firstError(error);
+
   return (
     <div>
       <label className="mb-2 block text-sm font-semibold text-slate-700">{label}</label>
       {children}
-      {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+      {message ? <p className="mt-2 text-sm text-red-600">{message}</p> : null}
     </div>
   );
 }

@@ -3,7 +3,9 @@ import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
-const pages = import.meta.glob('./Pages/**/*.{jsx,tsx}');
+const pages = import.meta.glob<{ default: React.ComponentType }>(
+  './Pages/**/*.{jsx,tsx}',
+);
 
 function readInitialPage() {
   const pageElement = document.getElementById('inertia-page');

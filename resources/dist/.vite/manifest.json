@@ -1,0 +1,477 @@
+{
+  "_AppLayout-DKzAzzt0.js": {
+    "file": "assets/AppLayout-DKzAzzt0.js",
+    "name": "AppLayout",
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx"
+    ]
+  },
+  "_Textarea-ChAHJPsK.js": {
+    "file": "assets/Textarea-ChAHJPsK.js",
+    "name": "Textarea",
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx"
+    ]
+  },
+  "_UI-98NGxPoF.js": {
+    "file": "assets/UI-98NGxPoF.js",
+    "name": "UI",
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "_jsx-runtime-u17CrQMm.js": {
+    "file": "assets/jsx-runtime-u17CrQMm.js",
+    "name": "jsx-runtime"
+  },
+  "_modelConfigs-D9iebz8t.js": {
+    "file": "assets/modelConfigs-D9iebz8t.js",
+    "name": "modelConfigs"
+  },
+  "js/Pages/Account.jsx": {
+    "file": "assets/Account-RMpWb4vU.js",
+    "name": "Account",
+    "src": "js/Pages/Account.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Category.jsx": {
+    "file": "assets/Category-CAxyVWC_.js",
+    "name": "Category",
+    "src": "js/Pages/Category.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Currency.jsx": {
+    "file": "assets/Currency-eTBpw2vi.js",
+    "name": "Currency",
+    "src": "js/Pages/Currency.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Dashboard.jsx": {
+    "file": "assets/Dashboard-wD_zWFU5.js",
+    "name": "Dashboard",
+    "src": "js/Pages/Dashboard.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Departments.tsx": {
+    "file": "assets/Departments-CtJTPYVF.js",
+    "name": "Departments",
+    "src": "js/Pages/Departments.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Expense.jsx": {
+    "file": "assets/Expense-CbBAPzge.js",
+    "name": "Expense",
+    "src": "js/Pages/Expense.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/ExpenseType.jsx": {
+    "file": "assets/ExpenseType-DwBdt_4U.js",
+    "name": "ExpenseType",
+    "src": "js/Pages/ExpenseType.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Login.tsx": {
+    "file": "assets/Login-BBbQgclS.js",
+    "name": "Login",
+    "src": "js/Pages/Login.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx"
+    ]
+  },
+  "js/Pages/Operations.tsx": {
+    "file": "assets/Operations-PE2BQLY6.js",
+    "name": "Operations",
+    "src": "js/Pages/Operations.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "js/main.tsx",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Party.jsx": {
+    "file": "assets/Party-BV1UnrTJ.js",
+    "name": "Party",
+    "src": "js/Pages/Party.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/PermissionDenied.tsx": {
+    "file": "assets/PermissionDenied-CQQdK4aZ.js",
+    "name": "PermissionDenied",
+    "src": "js/Pages/PermissionDenied.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Product.jsx": {
+    "file": "assets/Product-CqZdUDi9.js",
+    "name": "Product",
+    "src": "js/Pages/Product.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/ProductSearch.tsx": {
+    "file": "assets/ProductSearch-COLcsEzG.js",
+    "name": "ProductSearch",
+    "src": "js/Pages/ProductSearch.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Products.jsx": {
+    "file": "assets/Products-v4S_TWic.js",
+    "name": "Products",
+    "src": "js/Pages/Products.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Profile.tsx": {
+    "file": "assets/Profile-D825suaB.js",
+    "name": "Profile",
+    "src": "js/Pages/Profile.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js"
+    ]
+  },
+  "js/Pages/PurchaseBatch.jsx": {
+    "file": "assets/PurchaseBatch-BlpS9pbV.js",
+    "name": "PurchaseBatch",
+    "src": "js/Pages/PurchaseBatch.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/PurchaseItem.jsx": {
+    "file": "assets/PurchaseItem-9QmB0un2.js",
+    "name": "PurchaseItem",
+    "src": "js/Pages/PurchaseItem.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/PurchasePayment.jsx": {
+    "file": "assets/PurchasePayment-7jTHisfL.js",
+    "name": "PurchasePayment",
+    "src": "js/Pages/PurchasePayment.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Sale.jsx": {
+    "file": "assets/Sale-CSrrrKv6.js",
+    "name": "Sale",
+    "src": "js/Pages/Sale.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/SaleItem.jsx": {
+    "file": "assets/SaleItem-COnM55SK.js",
+    "name": "SaleItem",
+    "src": "js/Pages/SaleItem.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/SalePayment.jsx": {
+    "file": "assets/SalePayment-Dwf-VHCf.js",
+    "name": "SalePayment",
+    "src": "js/Pages/SalePayment.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/SaleServiceItems.tsx": {
+    "file": "assets/SaleServiceItems-BG6yzRh3.js",
+    "name": "SaleServiceItems",
+    "src": "js/Pages/SaleServiceItems.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Services.tsx": {
+    "file": "assets/Services-XAsdWS5C.js",
+    "name": "Services",
+    "src": "js/Pages/Services.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Shared/ModelCrudPage.jsx": {
+    "file": "assets/ModelCrudPage-C766iIsx.js",
+    "name": "ModelCrudPage",
+    "src": "js/Pages/Shared/ModelCrudPage.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/StockMovements.tsx": {
+    "file": "assets/StockMovements-D9RHL94T.js",
+    "name": "StockMovements",
+    "src": "js/Pages/StockMovements.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/StockProfitReport.jsx": {
+    "file": "assets/StockProfitReport-B36qO_1a.js",
+    "name": "StockProfitReport",
+    "src": "js/Pages/StockProfitReport.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Transaction.jsx": {
+    "file": "assets/Transaction-gDyGUWjr.js",
+    "name": "Transaction",
+    "src": "js/Pages/Transaction.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Unit.jsx": {
+    "file": "assets/Unit-eJQz2Icf.js",
+    "name": "Unit",
+    "src": "js/Pages/Unit.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/Users.tsx": {
+    "file": "assets/Users-DCQt5Dpv.js",
+    "name": "Users",
+    "src": "js/Pages/Users.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_UI-98NGxPoF.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/Pages/createModelPage.tsx": {
+    "file": "assets/createModelPage-hU8WkCXX.js",
+    "name": "createModelPage",
+    "src": "js/Pages/createModelPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-u17CrQMm.js",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "_modelConfigs-D9iebz8t.js",
+      "js/main.tsx",
+      "_AppLayout-DKzAzzt0.js",
+      "_Textarea-ChAHJPsK.js"
+    ]
+  },
+  "js/main.tsx": {
+    "file": "assets/main-B978I8y9.js",
+    "name": "main",
+    "src": "js/main.tsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "js/Pages/Account.jsx",
+      "js/Pages/Category.jsx",
+      "js/Pages/Currency.jsx",
+      "js/Pages/Dashboard.jsx",
+      "js/Pages/Departments.tsx",
+      "js/Pages/Expense.jsx",
+      "js/Pages/ExpenseType.jsx",
+      "js/Pages/Login.tsx",
+      "js/Pages/Operations.tsx",
+      "js/Pages/Party.jsx",
+      "js/Pages/PermissionDenied.tsx",
+      "js/Pages/Product.jsx",
+      "js/Pages/ProductSearch.tsx",
+      "js/Pages/Products.jsx",
+      "js/Pages/Profile.tsx",
+      "js/Pages/PurchaseBatch.jsx",
+      "js/Pages/PurchaseItem.jsx",
+      "js/Pages/PurchasePayment.jsx",
+      "js/Pages/Sale.jsx",
+      "js/Pages/SaleItem.jsx",
+      "js/Pages/SalePayment.jsx",
+      "js/Pages/SaleServiceItems.tsx",
+      "js/Pages/Services.tsx",
+      "js/Pages/Shared/ModelCrudPage.jsx",
+      "js/Pages/StockMovements.tsx",
+      "js/Pages/StockProfitReport.jsx",
+      "js/Pages/Transaction.jsx",
+      "js/Pages/Unit.jsx",
+      "js/Pages/Users.tsx",
+      "js/Pages/createModelPage.tsx"
+    ],
+    "css": [
+      "assets/main-kviv-PO1.css"
+    ]
+  }
+}
